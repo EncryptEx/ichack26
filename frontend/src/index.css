@@ -86,3 +86,23 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #636E72;
 }
+
+/* Bottom sheet animation */
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Recording pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
