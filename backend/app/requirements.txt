@@ -2,3 +2,9 @@ fastapi
 uvicorn
 gpiozero
 pydantic
+pydantic[email]
+sqlalchemy
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt==4.0.1
+python-multipart
