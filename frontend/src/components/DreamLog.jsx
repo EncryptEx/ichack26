@@ -25,13 +25,14 @@ const styles = {
   container: {
     padding: '12px 0 16px',
     flexShrink: 0,
+    minHeight: '160px',
   },
   title: {
     fontSize: '18px',
     fontWeight: '600',
     color: '#2D3436',
     marginBottom: '12px',
-    paddingLeft: '24px',
+    paddingLeft: '16px',
     fontFamily: "'Lora', serif",
   },
   scrollContainer: {
@@ -39,8 +40,8 @@ const styles = {
     gap: '12px',
     overflowX: 'auto',
     overflowY: 'hidden',
-    paddingLeft: '24px',
-    paddingRight: '24px',
+    paddingLeft: '16px',
+    paddingRight: '16px',
     paddingBottom: '8px',
     scrollSnapType: 'x mandatory',
   },

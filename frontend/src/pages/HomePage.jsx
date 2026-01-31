@@ -110,7 +110,7 @@ const styles = {
     paddingBottom: '70px',
   },
   header: {
-    padding: '24px 24px 8px',
+    padding: '24px 16px 8px',
     flexShrink: 0,
   },
   greeting: {
@@ -121,7 +121,7 @@ const styles = {
     fontFamily: "'Lora', serif",
   },
   sleepSection: {
-    padding: '8px 24px',
+    padding: '8px 0',
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -132,7 +132,8 @@ const styles = {
     flex: 1,
     overflowY: 'auto',
     overflowX: 'hidden',
-    paddingRight: '4px',
+    paddingLeft: '16px',
+    paddingRight: '20px',
     borderRadius: '16px',
   },
 };
