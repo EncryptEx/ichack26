@@ -10,7 +10,14 @@ from .models import User, TokenData
 import os
 
 # Security configuration
-SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
+import secrets
+
+# Generate a random secret key if not provided in environment
+# In production, always set SECRET_KEY environment variable
+DEFAULT_SECRET = secrets.token_urlsafe(32)
+SECRET_KEY = os.getenv("SECRET_KEY", DEFAULT_SECRET)
+if SECRET_KEY == DEFAULT_SECRET and os.getenv("ENVIRONMENT") == "production":
+    raise ValueError("SECRET_KEY must be set in production environment!")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 

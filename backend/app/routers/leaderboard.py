@@ -66,18 +66,21 @@ def get_sleep_hours_leaderboard(
         
         if user_stats:
             user_value = round(user_stats / 60, 2)
-            # Find rank by counting users with more sleep hours
-            users_above = db.query(
-                func.count(func.distinct(SleepSession.user_id))
-            ).filter(
+            # Find rank by counting users with more sleep hours using a subquery
+            from sqlalchemy import select
+            user_totals = select(
+                SleepSession.user_id,
+                func.sum(SleepSession.duration_minutes).label('total')
+            ).where(
                 SleepSession.end_time.isnot(None)
             ).group_by(
                 SleepSession.user_id
             ).having(
                 func.sum(SleepSession.duration_minutes) > user_stats
-            ).scalar()
+            ).alias()
             
-            user_rank = (users_above or 0) + 1
+            users_above = db.query(func.count()).select_from(user_totals).scalar() or 0
+            user_rank = users_above + 1
     
     return LeaderboardResponse(
         entries=entries,
