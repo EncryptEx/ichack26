@@ -8,7 +8,7 @@ import Navigation from './components/Navigation'
 
 function App() {
   return (
-    <div style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', position: 'relative', paddingBottom: '80px' }}>
+    <div style={{ maxWidth: '480px', margin: '0 auto', minHeight: '100vh', position: 'relative' }}>
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/sleep/:userId/:date" element={<DetailedSleepPage />} />

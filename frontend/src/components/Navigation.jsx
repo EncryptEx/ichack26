@@ -51,10 +51,10 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-around',
     alignItems: 'center',
-    padding: '12px 20px 20px',
-    borderTopLeftRadius: '30px',
-    borderTopRightRadius: '30px',
-    boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
+    padding: '10px 20px 16px',
+    borderTopLeftRadius: '24px',
+    borderTopRightRadius: '24px',
+    boxShadow: '0 -2px 16px rgba(0, 0, 0, 0.06)',
   },
   navItem: {
     display: 'flex',
@@ -68,8 +68,8 @@ const styles = {
     color: '#2D3436',
   },
   iconWrapper: {
-    width: '50px',
-    height: '50px',
+    width: '44px',
+    height: '44px',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -77,7 +77,7 @@ const styles = {
     transition: 'background 0.2s',
   },
   activeIconWrapper: {
-    background: '#F5D799',
+    background: '#FFCA5F',
   },
 };
 

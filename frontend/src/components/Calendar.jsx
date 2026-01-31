@@ -82,7 +82,8 @@ const Calendar = ({ selectedDate, onDateSelect }) => {
 
 const styles = {
   container: {
-    padding: '20px 10px',
+    padding: '16px 10px 20px',
+    flexShrink: 0,
   },
   header: {
     display: 'flex',
@@ -93,10 +94,11 @@ const styles = {
   navButton: {
     background: 'none',
     border: 'none',
-    fontSize: '24px',
+    fontSize: '18px',
     cursor: 'pointer',
     color: '#2D3436',
-    padding: '5px 10px',
+    padding: '2px 6px',
+    opacity: 0.6,
   },
   daysRow: {
     display: 'flex',
@@ -104,28 +106,30 @@ const styles = {
     flex: 1,
   },
   dayLabel: {
-    fontSize: '14px',
+    fontSize: '13px',
     color: '#2D3436',
-    width: '40px',
+    width: '42px',
     textAlign: 'center',
+    fontFamily: "'Inter', sans-serif",
   },
   datesRow: {
     display: 'flex',
     justifyContent: 'space-around',
-    paddingLeft: '30px',
-    paddingRight: '30px',
+    paddingLeft: '28px',
+    paddingRight: '28px',
   },
   dateButton: {
-    width: '40px',
-    height: '40px',
+    width: '42px',
+    height: '42px',
     borderRadius: '50%',
     border: 'none',
-    background: 'transparent',
-    fontSize: '16px',
+    background: 'white',
+    fontSize: '15px',
     fontWeight: '500',
     cursor: 'pointer',
     color: '#2D3436',
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
   },
   selectedDate: {
     background: '#2D3436',

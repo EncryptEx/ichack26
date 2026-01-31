@@ -12,6 +12,9 @@ export const friends = [
   { id: 'user3', name: 'Jaume', avatar: '👨', streak: 2 },
   { id: 'user4', name: 'Sofia', avatar: '👧', streak: 8 },
   { id: 'user5', name: 'Marcus', avatar: '🧔', streak: 12 },
+  { id: 'user6', name: 'Emma', avatar: '👱‍♀️', streak: 6 },
+  { id: 'user7', name: 'Lucas', avatar: '👦', streak: 3 },
+  { id: 'user8', name: 'Mia', avatar: '👩‍🦰', streak: 9 },
 ];
 
 export const generateSleepData = (userId, date) => {
@@ -20,6 +23,8 @@ export const generateSleepData = (userId, date) => {
   const sleepHours = 5 + (seed % 5) + (Math.random() * 2);
   const sleepQuality = 40 + (seed % 50) + Math.floor(Math.random() * 10);
   const points = Math.floor(sleepHours * 10 + sleepQuality * 0.5);
+  // Determine if points went up or down (based on seed for consistency)
+  const pointsChange = (seed % 3 === 0) ? 'down' : 'up';
   
   return {
     userId,
@@ -27,6 +32,7 @@ export const generateSleepData = (userId, date) => {
     sleepHours: parseFloat(sleepHours.toFixed(1)),
     sleepQuality: Math.min(100, sleepQuality),
     points,
+    pointsChange,
     bedTime: '23:30',
     wakeTime: '07:48',
     deepSleep: parseFloat((sleepHours * 0.2).toFixed(1)),
