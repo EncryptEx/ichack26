@@ -21,6 +21,12 @@ cd /path/to/ichack26/backend
 # You should see the 'app' directory when you run: ls
 ```
 
+**Verify your setup:** Run the verification script to check everything is configured correctly:
+```bash
+python verify_setup.py
+```
+This script will check your working directory, Python version, dependencies, and application structure.
+
 ### 2. Install Dependencies
 ```bash
 pip install -r app/requirements.txt

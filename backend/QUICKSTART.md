@@ -11,6 +11,12 @@ cd /path/to/ichack26/backend
 ls
 ```
 
+**Need help?** Run the setup verification script:
+```bash
+python verify_setup.py
+```
+This will check your environment and tell you exactly what needs to be fixed.
+
 ### 2. Install Dependencies
 ```bash
 pip install -r app/requirements.txt
