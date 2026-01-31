@@ -1,0 +1,48 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #F5D799 0%, #FFF8E7 30%);
+  min-height: 100vh;
+}
+
+:root {
+  --primary-yellow: #F5D799;
+  --light-yellow: #FFF8E7;
+  --coral: #FF6B6B;
+  --coral-light: #FFE5E5;
+  --blue-light: #E8F4FF;
+  --text-dark: #2D3436;
+  --text-gray: #636E72;
+  --white: #FFFFFF;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-yellow);
+  border-radius: 3px;
+}
+
+/* Hide scrollbar for horizontal scroll */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
