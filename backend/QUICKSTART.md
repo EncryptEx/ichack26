@@ -2,23 +2,32 @@
 
 ## For Developers
 
-### 1. Install Dependencies
+### 1. Navigate to the Backend Directory
+**IMPORTANT**: Always run commands from the `backend` directory, not from inside `app/`.
+
 ```bash
-cd backend
+cd /path/to/ichack26/backend
+# Verify you're in the right place - you should see 'app' directory:
+ls
+```
+
+### 2. Install Dependencies
+```bash
 pip install -r app/requirements.txt
 ```
 
-### 2. Run the Server
+### 3. Run the Server
+**From the `backend` directory:**
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. Access the API
+### 4. Access the API
 - Main URL: http://localhost:8000
 - Interactive Docs: http://localhost:8000/docs
 - Health Check: http://localhost:8000/health
 
-### 4. Test the API
+### 5. Test the API
 ```bash
 # Run the example script
 python example_usage.py
@@ -138,9 +147,27 @@ The server outputs logs to stdout. Look for:
 
 ## Troubleshooting
 
-### Import Errors
+### "ModuleNotFoundError: No module named 'app'"
+
+**This is the most common error!** It happens when you run `uvicorn app.main:app` from inside the `app/` directory.
+
+**Solution:**
+```bash
+# ❌ Wrong - you're inside app/
+cd /path/to/backend/app
+uvicorn app.main:app  # FAILS with ModuleNotFoundError
+
+# ✅ Correct - go up one level to backend/
+cd /path/to/backend
+uvicorn app.main:app  # Works!
+```
+
+**Quick Check:** Run `pwd` to see your current directory. It should end with `backend`, not `backend/app`.
+
+### Import Errors (Missing Dependencies)
 Make sure you're in the `backend` directory and have installed all dependencies:
 ```bash
+cd /path/to/backend
 pip install -r app/requirements.txt
 ```
 
