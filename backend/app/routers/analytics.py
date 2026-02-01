@@ -154,3 +154,74 @@ def get_quality_metrics(
         "quality_distribution": distribution,
         "recent_quality_trend": recent_trend
     }
+
+
+@router.get("/streak", response_model=dict)
+def get_sleep_streak(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get the current sleep streak for the user.
+    A streak is counted as consecutive days with at least one completed sleep session.
+    """
+    # Get all completed sessions ordered by date (most recent first)
+    sessions = db.query(SleepSession).filter(
+        SleepSession.user_id == current_user.id,
+        SleepSession.end_time.isnot(None)
+    ).order_by(SleepSession.start_time.desc()).all()
+    
+    if not sessions:
+        return {
+            "current_streak": 0,
+            "longest_streak": 0,
+            "last_sleep_date": None
+        }
+    
+    # Get unique dates with sleep sessions (using the date of sleep start)
+    sleep_dates = set()
+    for session in sessions:
+        # Use the date when the sleep session started
+        sleep_dates.add(session.start_time.date())
+    
+    # Sort dates in descending order
+    sorted_dates = sorted(sleep_dates, reverse=True)
+    
+    # Calculate current streak
+    today = datetime.utcnow().date()
+    yesterday = today - timedelta(days=1)
+    
+    current_streak = 0
+    
+    # Check if the most recent sleep was today or yesterday
+    if sorted_dates and (sorted_dates[0] == today or sorted_dates[0] == yesterday):
+        # Count consecutive days backwards from the most recent date
+        expected_date = sorted_dates[0]
+        for sleep_date in sorted_dates:
+            if sleep_date == expected_date:
+                current_streak += 1
+                expected_date = expected_date - timedelta(days=1)
+            elif sleep_date < expected_date:
+                # Gap in dates, streak broken
+                break
+    
+    # Calculate longest streak ever
+    longest_streak = 0
+    if sorted_dates:
+        streak = 1
+        sorted_dates_asc = sorted(sleep_dates)
+        for i in range(1, len(sorted_dates_asc)):
+            if sorted_dates_asc[i] - sorted_dates_asc[i-1] == timedelta(days=1):
+                streak += 1
+            else:
+                longest_streak = max(longest_streak, streak)
+                streak = 1
+        longest_streak = max(longest_streak, streak)
+    
+    last_sleep_date = sorted_dates[0].isoformat() if sorted_dates else None
+    
+    return {
+        "current_streak": current_streak,
+        "longest_streak": longest_streak,
+        "last_sleep_date": last_sleep_date
+    }

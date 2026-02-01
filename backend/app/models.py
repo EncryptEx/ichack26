@@ -299,6 +299,17 @@ class DreamLogResponse(DreamLogBase):
         from_attributes = True
 
 
+class DreamLogWithUserResponse(DreamLogBase):
+    """Dream log response with user information for social feed."""
+    id: int
+    user_id: int
+    date: datetime
+    username: str  # Added for social feed
+    
+    class Config:
+        from_attributes = True
+
+
 class DayDreamsResponse(BaseModel):
     """Day-based dream log summary for frontend."""
     date: str  # YYYY-MM-DD format

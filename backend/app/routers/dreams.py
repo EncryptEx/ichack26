@@ -6,7 +6,7 @@ from typing import List
 from ..database import get_db
 from ..models import (
     User, DreamLog, DreamLogCreate, DreamLogResponse, DreamLogUpdate,
-    DayDreamsResponse
+    DayDreamsResponse, DreamLogWithUserResponse
 )
 from ..auth import get_current_user
 
@@ -33,6 +33,38 @@ def create_dream_entry(
     db.refresh(new_dream)
     
     return new_dream
+
+
+@router.get("/feed", response_model=List[DreamLogWithUserResponse])
+def get_dreams_feed(
+    skip: int = 0,
+    limit: int = 50,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get recent dreams from all users (social feed).
+    Returns dreams with username information.
+    """
+    # Query dreams with user join to get username
+    dreams = db.query(DreamLog, User.username).join(
+        User, DreamLog.user_id == User.id
+    ).order_by(DreamLog.date.desc()).offset(skip).limit(limit).all()
+    
+    # Transform to response format
+    result = []
+    for dream, username in dreams:
+        result.append(DreamLogWithUserResponse(
+            id=dream.id,
+            user_id=dream.user_id,
+            title=dream.title,
+            content=dream.content,
+            mood=dream.mood,
+            date=dream.date,
+            username=username if dream.user_id != current_user.id else "You"
+        ))
+    
+    return result
 
 
 @router.get("/", response_model=List[DreamLogResponse])

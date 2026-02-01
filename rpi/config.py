@@ -19,8 +19,8 @@ WINDOW_DURATION_SECONDS = 5  # Aggregate samples into 30s windows
 
 # ============= Detection Thresholds =============
 # Distance thresholds (in meters)
-IN_BED_THRESHOLD_M = 1.0      # < 1m = person in bed
-OUT_OF_BED_THRESHOLD_M = 1.2  # > 1.2m with hysteresis = out of bed
+IN_BED_THRESHOLD_M = 0.5      # < 1m = person in bed
+OUT_OF_BED_THRESHOLD_M = 1.0  # > 1.2m with hysteresis = out of bed
 
 # Debounce times
 IN_BED_DEBOUNCE_SECONDS = 5   # Must be < threshold for N seconds to start session
