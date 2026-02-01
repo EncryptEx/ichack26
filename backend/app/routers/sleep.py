@@ -224,7 +224,7 @@ def _build_session_summary(
         end_time=session.end_time,
         sleep_onset_time=session.sleep_onset_time,
         hours_slept=round((session.duration_minutes or 0) / 60, 2),
-        sleep_quality=session.quality_score or 0,
+        sleep_quality=int(session.quality_score or 0),
         points_earned=session.points_earned or 0,
         points_delta_vs_yesterday=points_delta,
         rank_change=rank_change,
