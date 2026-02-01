@@ -59,13 +59,20 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 - `POST /api/sleep/end` - End the current sleep session
 - `GET /api/sleep/sessions` - Get all sleep sessions
 - `GET /api/sleep/current` - Get current active session
+- `GET /api/sleep/latest/summary` - Get full summary of latest completed session
+- `GET /api/sleep/sessions/{session_uuid}/summary` - Get summary of specific session
+- `GET /api/sleep/day/{day_date}` - Get all sleep data for a specific day (YYYY-MM-DD)
+- `GET /api/sleep/days?start_date=&end_date=` - Get sleep data for a date range
 
 ### Dream Log (`/api/dreams`)
 - `POST /api/dreams/` - Create a new dream entry
-- `GET /api/dreams/` - Get all dream entries
+- `GET /api/dreams/` - Get all dream entries for current user
+- `GET /api/dreams/feed` - Get all users' dreams (social feed)
 - `GET /api/dreams/{id}` - Get a specific dream entry
 - `PUT /api/dreams/{id}` - Update a dream entry
 - `DELETE /api/dreams/{id}` - Delete a dream entry
+- `GET /api/dreams/day/{day_date}` - Get dreams for a specific day (YYYY-MM-DD)
+- `GET /api/dreams/days?start_date=&end_date=` - Get dreams for a date range
 
 ### Analytics (`/api/analytics`)
 - `GET /api/analytics/overview` - Get sleep statistics overview
@@ -121,6 +128,18 @@ curl -X POST http://localhost:8000/api/sleep/end \
   -d '{"quality_score": 85.5, "notes": "Slept well!"}'
 ```
 
+### Get Sleep Data for a Specific Day
+```bash
+curl http://localhost:8000/api/sleep/day/2026-02-01 \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### Get Sleep Data for a Date Range
+```bash
+curl "http://localhost:8000/api/sleep/days?start_date=2026-01-25&end_date=2026-02-01" \
+  -H "Authorization: Bearer <your-token>"
+```
+
 ### Create Dream Entry
 ```bash
 curl -X POST http://localhost:8000/api/dreams/ \
@@ -131,6 +150,18 @@ curl -X POST http://localhost:8000/api/dreams/ \
     "content": "I was flying over mountains",
     "mood": "happy"
   }'
+```
+
+### Get Dreams Feed (All Users)
+```bash
+curl http://localhost:8000/api/dreams/feed \
+  -H "Authorization: Bearer <your-token>"
+```
+
+### Get Dreams for a Specific Day
+```bash
+curl http://localhost:8000/api/dreams/day/2026-02-01 \
+  -H "Authorization: Bearer <your-token>"
 ```
 
 ### Get Analytics

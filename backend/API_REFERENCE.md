@@ -212,6 +212,122 @@ Get the current active sleep session if one exists. Requires authentication.
 }
 ```
 
+#### GET /api/sleep/latest/summary
+Get the full summary of the latest completed sleep session. Requires authentication.
+
+**Response (200):**
+```json
+{
+  "session_id": "abc123-uuid",
+  "user_id": 1,
+  "start_time": "2026-01-31T22:00:00",
+  "end_time": "2026-02-01T06:30:00",
+  "sleep_onset_time": "2026-01-31T22:15:00",
+  "hours_slept": 8.5,
+  "sleep_quality": 85,
+  "points_earned": 95,
+  "points_delta_vs_yesterday": 10,
+  "rank_change": 1,
+  "current_rank": 3,
+  "awakenings_count": 2,
+  "restless_minutes": 15.0,
+  "still_minutes": 480.0,
+  "out_of_bed_minutes": 5.0,
+  "stages": {
+    "deep_minutes": 90.0,
+    "rem_minutes": 120.0,
+    "core_minutes": 300.0,
+    "disclaimer": "Estimated based on movement patterns only"
+  },
+  "intervals": [
+    {
+      "start": "2026-01-31T22:15:00",
+      "end": "2026-02-01T01:00:00",
+      "state": "sleeping"
+    },
+    {
+      "start": "2026-02-01T01:00:00",
+      "end": "2026-02-01T01:05:00",
+      "state": "awake"
+    }
+  ]
+}
+```
+
+#### GET /api/sleep/sessions/{session_uuid}/summary
+Get the full summary of a specific sleep session. Requires authentication.
+
+**Path Parameters:**
+- `session_uuid`: The unique identifier of the sleep session
+
+**Response (200):** Same format as `/api/sleep/latest/summary`
+
+#### GET /api/sleep/day/{day_date}
+Get all sleep data for a specific day. Requires authentication.
+
+**Path Parameters:**
+- `day_date`: Date in YYYY-MM-DD format (e.g., `2026-02-01`)
+
+**Response (200):**
+```json
+{
+  "date": "2026-02-01",
+  "sessions": [
+    {
+      "session_id": "abc123-uuid",
+      "user_id": 1,
+      "start_time": "2026-01-31T22:00:00",
+      "end_time": "2026-02-01T06:30:00",
+      "hours_slept": 8.5,
+      "sleep_quality": 85,
+      "points_earned": 95,
+      "awakenings_count": 2,
+      "restless_minutes": 15.0,
+      "still_minutes": 480.0,
+      "out_of_bed_minutes": 5.0,
+      "stages": { ... },
+      "intervals": [ ... ]
+    }
+  ],
+  "total_hours_slept": 8.5,
+  "total_points_earned": 95,
+  "average_quality": 85,
+  "total_awakenings": 2,
+  "points_delta_vs_yesterday": 10,
+  "current_rank": 3
+}
+```
+
+#### GET /api/sleep/days
+Get sleep data for a date range. Useful for calendar views. Requires authentication.
+
+**Query Parameters:**
+- `start_date` (required): Start date in YYYY-MM-DD format
+- `end_date` (required): End date in YYYY-MM-DD format (max 31 days range)
+
+**Example:** `GET /api/sleep/days?start_date=2026-01-25&end_date=2026-02-01`
+
+**Response (200):**
+```json
+[
+  {
+    "date": "2026-01-25",
+    "sessions": [...],
+    "total_hours_slept": 7.5,
+    "total_points_earned": 80,
+    "average_quality": 75,
+    "total_awakenings": 1,
+    "points_delta_vs_yesterday": -5,
+    "current_rank": 4
+  },
+  {
+    "date": "2026-01-26",
+    "sessions": [...],
+    ...
+  }
+]
+```
+
 ---
 
 ### Dream Log
@@ -257,6 +373,87 @@ Get all dream log entries for the current user. Requires authentication.
     "title": "Flying Dream",
     "content": "I was flying over mountains and valleys.",
     "mood": "happy"
+  }
+]
+```
+
+#### GET /api/dreams/feed
+Get dreams from all users (social feed). Requires authentication.
+Returns dreams with username information. Shows "You" for the current user's dreams.
+
+**Query Parameters:**
+- `skip` (optional): Number of records to skip (default: 0)
+- `limit` (optional): Maximum number of records to return (default: 50)
+
+**Response (200):**
+```json
+[
+  {
+    "id": 3,
+    "user_id": 2,
+    "date": "2026-02-01T08:00:00",
+    "title": "Ocean Dream",
+    "content": "I was swimming in a crystal clear ocean.",
+    "mood": "peaceful",
+    "username": "jane_doe"
+  },
+  {
+    "id": 1,
+    "user_id": 1,
+    "date": "2026-02-01T07:00:00",
+    "title": "Flying Dream",
+    "content": "I was flying over mountains and valleys.",
+    "mood": "happy",
+    "username": "You"
+  }
+]
+```
+
+#### GET /api/dreams/day/{day_date}
+Get all dream entries for a specific day. Requires authentication.
+
+**Path Parameters:**
+- `day_date`: Date in YYYY-MM-DD format (e.g., `2026-02-01`)
+
+**Response (200):**
+```json
+{
+  "date": "2026-02-01",
+  "dreams": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "date": "2026-02-01T07:00:00",
+      "title": "Flying Dream",
+      "content": "I was flying over mountains and valleys.",
+      "mood": "happy"
+    }
+  ],
+  "total_entries": 1
+}
+```
+
+#### GET /api/dreams/days
+Get dream entries for a date range. Requires authentication.
+
+**Query Parameters:**
+- `start_date` (required): Start date in YYYY-MM-DD format
+- `end_date` (required): End date in YYYY-MM-DD format (max 31 days range)
+
+**Example:** `GET /api/dreams/days?start_date=2026-01-25&end_date=2026-02-01`
+
+**Response (200):**
+```json
+[
+  {
+    "date": "2026-01-25",
+    "dreams": [...],
+    "total_entries": 2
+  },
+  {
+    "date": "2026-01-26",
+    "dreams": [...],
+    "total_entries": 1
   }
 ]
 ```

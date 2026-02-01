@@ -187,7 +187,6 @@ def get_dreams_by_day(
         )
     
     dreams = db.query(DreamLog).filter(
-        DreamLog.user_id == current_user.id,
         func.date(DreamLog.date) == target_date
     ).order_by(DreamLog.date).all()
     

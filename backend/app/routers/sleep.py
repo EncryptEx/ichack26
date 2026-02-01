@@ -194,7 +194,6 @@ def get_sleep_by_day(
     
     # Get all completed sessions that started on this day
     sessions = db.query(SleepSession).filter(
-        SleepSession.user_id == current_user.id,
         func.date(SleepSession.start_time) == target_date,
         SleepSession.end_time.isnot(None)
     ).order_by(SleepSession.start_time).all()
