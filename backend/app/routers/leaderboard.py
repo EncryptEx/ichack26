@@ -66,18 +66,21 @@ def get_sleep_hours_leaderboard(
         
         if user_stats:
             user_value = round(user_stats / 60, 2)
-            # Find rank by counting users with more sleep hours
-            users_above = db.query(
-                func.count(func.distinct(SleepSession.user_id))
-            ).filter(
+            # Find rank by counting users with more sleep hours using a subquery
+            from sqlalchemy import select
+            user_totals = select(
+                SleepSession.user_id,
+                func.sum(SleepSession.duration_minutes).label('total')
+            ).where(
                 SleepSession.end_time.isnot(None)
             ).group_by(
                 SleepSession.user_id
             ).having(
                 func.sum(SleepSession.duration_minutes) > user_stats
-            ).scalar()
+            ).alias()
             
-            user_rank = (users_above or 0) + 1
+            users_above = db.query(func.count()).select_from(user_totals).scalar() or 0
+            user_rank = users_above + 1
     
     return LeaderboardResponse(
         entries=entries,
@@ -206,6 +209,160 @@ def get_quality_leaderboard(
         
         if user_stats:
             user_value = round(user_stats, 2)
+    
+    return LeaderboardResponse(
+        entries=entries,
+        user_rank=user_rank,
+        user_value=user_value
+    )
+
+
+@router.get("/points/daily", response_model=LeaderboardResponse)
+def get_daily_points_leaderboard(
+    limit: int = 10,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get today's points leaderboard.
+    """
+    today = datetime.utcnow().date()
+    
+    # Get today's points for each user
+    today_data = db.query(
+        User.id,
+        User.username,
+        func.sum(SleepSession.points_earned).label('today_points')
+    ).join(
+        SleepSession, User.id == SleepSession.user_id
+    ).filter(
+        func.date(SleepSession.start_time) == today,
+        SleepSession.end_time.isnot(None)
+    ).group_by(
+        User.id, User.username
+    ).order_by(
+        func.sum(SleepSession.points_earned).desc()
+    ).limit(limit).all()
+    
+    # Convert to entries
+    entries = []
+    user_rank = None
+    user_value = None
+    
+    for rank, (user_id, username, points) in enumerate(today_data, start=1):
+        pts = int(points) if points else 0
+        entries.append(LeaderboardEntry(
+            rank=rank,
+            username=username,
+            value=float(pts),
+            label=f"+{pts} pts"
+        ))
+        
+        if user_id == current_user.id:
+            user_rank = rank
+            user_value = float(pts)
+    
+    return LeaderboardResponse(
+        entries=entries,
+        user_rank=user_rank,
+        user_value=user_value
+    )
+
+
+@router.get("/points/monthly", response_model=LeaderboardResponse)
+def get_monthly_points_leaderboard(
+    limit: int = 10,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get this month's total points leaderboard.
+    """
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    
+    # Get monthly points for each user
+    monthly_data = db.query(
+        User.id,
+        User.username,
+        func.sum(SleepSession.points_earned).label('monthly_points')
+    ).join(
+        SleepSession, User.id == SleepSession.user_id
+    ).filter(
+        SleepSession.start_time >= month_start,
+        SleepSession.end_time.isnot(None)
+    ).group_by(
+        User.id, User.username
+    ).order_by(
+        func.sum(SleepSession.points_earned).desc()
+    ).limit(limit).all()
+    
+    # Convert to entries
+    entries = []
+    user_rank = None
+    user_value = None
+    
+    for rank, (user_id, username, points) in enumerate(monthly_data, start=1):
+        pts = int(points) if points else 0
+        entries.append(LeaderboardEntry(
+            rank=rank,
+            username=username,
+            value=float(pts),
+            label=f"{pts} pts"
+        ))
+        
+        if user_id == current_user.id:
+            user_rank = rank
+            user_value = float(pts)
+    
+    return LeaderboardResponse(
+        entries=entries,
+        user_rank=user_rank,
+        user_value=user_value
+    )
+
+
+@router.get("/points/alltime", response_model=LeaderboardResponse)
+def get_alltime_points_leaderboard(
+    limit: int = 10,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all-time total points leaderboard.
+    """
+    # Get total points for each user
+    alltime_data = db.query(
+        User.id,
+        User.username,
+        func.sum(SleepSession.points_earned).label('total_points')
+    ).join(
+        SleepSession, User.id == SleepSession.user_id
+    ).filter(
+        SleepSession.end_time.isnot(None)
+    ).group_by(
+        User.id, User.username
+    ).order_by(
+        func.sum(SleepSession.points_earned).desc()
+    ).limit(limit).all()
+    
+    # Convert to entries
+    entries = []
+    user_rank = None
+    user_value = None
+    
+    for rank, (user_id, username, points) in enumerate(alltime_data, start=1):
+        pts = int(points) if points else 0
+        entries.append(LeaderboardEntry(
+            rank=rank,
+            username=username,
+            value=float(pts),
+            label=f"{pts} pts"
+        ))
+        
+        if user_id == current_user.id:
+            user_rank = rank
+            user_value = float(pts)
     
     return LeaderboardResponse(
         entries=entries,

@@ -12,7 +12,6 @@ SLEEP_THRESHOLD_CM = 50.0
 
 logger = logging.getLogger("hardware")
 
-
 class SensorManager:
     def __init__(self):
         self.sensor = None

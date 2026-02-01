@@ -13,17 +13,32 @@ A comprehensive FastAPI backend for tracking sleep schedules, managing dream log
 
 ## Software Setup
 
-### 1. Install Dependencies
+### 1. Navigate to the Backend Directory
+**IMPORTANT**: Make sure you're in the `backend` directory (the parent of the `app` directory), not inside `app/`.
+
+```bash
+cd /path/to/ichack26/backend
+# You should see the 'app' directory when you run: ls
+```
+
+**Verify your setup:** Run the verification script to check everything is configured correctly:
+```bash
+python verify_setup.py
+```
+This script will check your working directory, Python version, dependencies, and application structure.
+
+### 2. Install Dependencies
 ```bash
 pip install -r app/requirements.txt
 ```
 
-### 2. Run the Server
+### 3. Run the Server
+**From the `backend` directory**, run:
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. Access the API
+### 4. Access the API
 - API will be available at `http://<your-pi-ip>:8000`
 - Interactive Docs: `http://<your-pi-ip>:8000/docs`
 
@@ -185,6 +200,62 @@ python /tmp/test_api.py
 - Consistency rankings (most regular sleep schedule)
 - Quality rankings (highest average sleep quality)
 - See your own rank and stats
+
+## Troubleshooting
+
+### ModuleNotFoundError: No module named 'app'
+
+**Problem**: When running `uvicorn app.main:app`, you get an error like:
+```
+ModuleNotFoundError: No module named 'app'
+```
+
+**Solution**: This error occurs when you're running the command from inside the `app` directory. You need to run it from the `backend` directory (the parent of `app`).
+
+```bash
+# ❌ Wrong - inside app directory
+cd /path/to/backend/app
+uvicorn app.main:app --reload  # This will fail!
+
+# ✅ Correct - in backend directory
+cd /path/to/backend
+uvicorn app.main:app --reload  # This works!
+```
+
+**Why?** The application uses relative imports (e.g., `from .hardware import ...`), which require the `app` directory to be a proper Python package. When you're already inside `app/`, Python can't find the package structure correctly.
+
+### ImportError: attempted relative import with no known parent package
+
+**Problem**: You get this error when trying to run the application.
+
+**Solution**: Make sure you're running `uvicorn app.main:app` (not `uvicorn main:app`) from the `backend` directory.
+
+### Dependencies Not Installed
+
+**Problem**: You get `ModuleNotFoundError: No module named 'fastapi'` or similar errors.
+
+**Solution**: Install the dependencies:
+```bash
+cd /path/to/backend
+pip install -r app/requirements.txt
+```
+
+### Port Already in Use
+
+**Problem**: Error message about port 8000 already being in use.
+
+**Solution**: Either:
+1. Stop the other process using port 8000
+2. Use a different port:
+   ```bash
+   uvicorn app.main:app --port 8001 --reload
+   ```
+
+### GPIO Warnings
+
+**Problem**: You see warnings about GPIO pins not being available.
+
+**Solution**: This is normal when not running on a Raspberry Pi. The application automatically runs in mock mode for testing. These warnings can be safely ignored during development.
 
 ## License
 

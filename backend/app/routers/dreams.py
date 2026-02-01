@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 from typing import List
 
 from ..database import get_db
 from ..models import (
-    User, DreamLog, DreamLogCreate, DreamLogResponse, DreamLogUpdate
+    User, DreamLog, DreamLogCreate, DreamLogResponse, DreamLogUpdate,
+    DayDreamsResponse
 )
 from ..auth import get_current_user
 
@@ -131,3 +133,77 @@ def delete_dream_entry(
     db.commit()
     
     return None
+
+
+@router.get("/day/{day_date}", response_model=DayDreamsResponse)
+def get_dreams_by_day(
+    day_date: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all dream entries for a specific day (YYYY-MM-DD format).
+    """
+    from sqlalchemy import func
+    
+    try:
+        target_date = datetime.strptime(day_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid date format. Use YYYY-MM-DD"
+        )
+    
+    dreams = db.query(DreamLog).filter(
+        DreamLog.user_id == current_user.id,
+        func.date(DreamLog.date) == target_date
+    ).order_by(DreamLog.date).all()
+    
+    return DayDreamsResponse(
+        date=day_date,
+        dreams=dreams,
+        total_entries=len(dreams)
+    )
+
+
+@router.get("/days", response_model=List[DayDreamsResponse])
+def get_dreams_by_date_range(
+    start_date: str = Query(..., description="Start date (YYYY-MM-DD)"),
+    end_date: str = Query(..., description="End date (YYYY-MM-DD)"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get dream entries for a date range. Returns a list of daily summaries.
+    """
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid date format. Use YYYY-MM-DD"
+        )
+    
+    if end < start:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="End date must be after start date"
+        )
+    
+    if (end - start).days > 31:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Date range cannot exceed 31 days"
+        )
+    
+    results = []
+    current_date = start
+    
+    while current_date <= end:
+        day_str = current_date.strftime("%Y-%m-%d")
+        day_response = get_dreams_by_day(day_str, current_user, db)
+        results.append(day_response)
+        current_date += timedelta(days=1)
+    
+    return results
