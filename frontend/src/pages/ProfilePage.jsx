@@ -1,126 +1,104 @@
 import { useState } from 'react';
-import { ArrowLeft, Settings, Bell, Moon, Users, LogOut, ChevronRight, Edit2 } from 'lucide-react';
+import { ArrowLeft, Edit2, Users, LogOut, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { currentUser, friends, weeklyStats } from '../data/mockData';
+import { currentUser, friends } from '../data/mockData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(currentUser.name);
 
-  const menuItems = [
-    { icon: Bell, label: 'Notifications', toggle: true, value: notifications, onChange: setNotifications },
-    { icon: Moon, label: 'Dark Mode', toggle: true, value: darkMode, onChange: setDarkMode },
-    { icon: Users, label: 'Manage Friends', action: true },
-    { icon: Settings, label: 'Settings', action: true },
-    { icon: LogOut, label: 'Log Out', action: true, danger: true },
-  ];
+  // Calculate Rank (mock logic)
+  const rank = 2; // Hardcoded derived from mock
+
+  const handleSave = () => {
+    // Here implies mock update
+    currentUser.name = name;
+    setIsEditing(false);
+  };
+
+  const handleLogout = () => {
+     alert("Logged out!");
+     navigate('/');
+  };
 
   return (
     <div style={styles.container}>
       <header style={styles.header}>
         <button onClick={() => navigate('/')} style={styles.backButton}>
-          <ArrowLeft size={24} />
+          <ArrowLeft size={24} color="#2D3436" />
         </button>
         <h1 style={styles.title}>Profile</h1>
-        <button style={styles.editButton}>
-          <Edit2 size={20} />
-        </button>
+        <div style={{width: 24}}></div>
       </header>
 
-      <div style={styles.profileCard}>
-        <div style={styles.avatarWrapper}>
-          <div style={styles.avatarLarge}>{currentUser.avatar || '😴'}</div>
-          <button style={styles.avatarEditButton}>
-            <Edit2 size={14} />
-          </button>
-        </div>
-        <h2 style={styles.userName}>{currentUser.name}</h2>
-        <p style={styles.userHandle}>@{currentUser.name.toLowerCase()}</p>
-        <p style={styles.streakLarge}>🔥 {currentUser.streak} day streak</p>
+      <div style={styles.content}>
         
-        <div style={styles.statsRow}>
-          <div style={styles.profileStat}>
-            <span style={styles.profileStatValue}>{friends.length}</span>
-            <span style={styles.profileStatLabel}>Friends</span>
-          </div>
-          <div style={styles.statDivider} />
-          <div style={styles.profileStat}>
-            <span style={styles.profileStatValue}>{weeklyStats.totalPoints}</span>
-            <span style={styles.profileStatLabel}>Weekly Points</span>
-          </div>
-          <div style={styles.statDivider} />
-          <div style={styles.profileStat}>
-            <span style={styles.profileStatValue}>#2</span>
-            <span style={styles.profileStatLabel}>Rank</span>
-          </div>
+        {/* Avatar Section */}
+        <div style={styles.avatarSection}>
+          <div style={styles.avatarLarge}>{currentUser.avatar || '😴'}</div>
+          {isEditing ? (
+             <input 
+                value={name} 
+                onChange={(e) => setName(e.target.value)}
+                style={styles.nameInput}
+                autoFocus
+             />
+          ) : (
+             <h2 style={styles.userName}>{name}</h2>
+          )}
+          <p style={styles.userHandle}>@{name.toLowerCase().replace(/\s/g, '')}</p>
         </div>
-      </div>
 
-      <div style={styles.achievementsCard}>
-        <h3 style={styles.sectionTitle}>Achievements</h3>
-        <div style={styles.achievementsGrid}>
-          <div style={styles.achievement}>
-            <span style={styles.achievementIcon}>🏆</span>
-            <span style={styles.achievementLabel}>First Win</span>
-          </div>
-          <div style={styles.achievement}>
-            <span style={styles.achievementIcon}>🔥</span>
-            <span style={styles.achievementLabel}>7 Day Streak</span>
-          </div>
-          <div style={styles.achievement}>
-            <span style={styles.achievementIcon}>⭐</span>
-            <span style={styles.achievementLabel}>Perfect Sleep</span>
-          </div>
-          <div style={{ ...styles.achievement, ...styles.lockedAchievement }}>
-            <span style={styles.achievementIcon}>🌙</span>
-            <span style={styles.achievementLabel}>Night Owl</span>
-          </div>
-        </div>
-      </div>
-
-      <div style={styles.menuCard}>
-        {menuItems.map((item, index) => (
-          <div 
-            key={item.label} 
-            style={{
-              ...styles.menuItem,
-              ...(index === menuItems.length - 1 ? { border: 'none' } : {}),
-            }}
-          >
-            <div style={styles.menuItemLeft}>
-              <item.icon 
-                size={22} 
-                color={item.danger ? '#FF6B6B' : '#2D3436'} 
-              />
-              <span style={{
-                ...styles.menuItemLabel,
-                ...(item.danger ? { color: '#FF6B6B' } : {}),
-              }}>
-                {item.label}
-              </span>
+        {/* Stats Row */}
+        <div style={styles.statsCard}>
+            <div style={styles.statItem}>
+                <span style={styles.statValue}>{currentUser.streak}</span>
+                <span style={styles.statLabel}>Day Streak</span>
             </div>
-            {item.toggle ? (
-              <label style={styles.toggleSwitch}>
-                <input
-                  type="checkbox"
-                  checked={item.value}
-                  onChange={(e) => item.onChange(e.target.checked)}
-                  style={styles.toggleInput}
-                />
-                <span style={{
-                  ...styles.toggleSlider,
-                  ...(item.value ? styles.toggleSliderActive : {}),
-                }} />
-              </label>
-            ) : (
-              <ChevronRight size={20} color="#B0B0B0" />
-            )}
-          </div>
-        ))}
-      </div>
+            <div style={styles.divider}></div>
+            <div style={styles.statItem}>
+                <span style={styles.statValue}>{friends.length}</span>
+                <span style={styles.statLabel}>Friends</span>
+            </div>
+            <div style={styles.divider}></div>
+            <div style={styles.statItem}>
+                <span style={styles.statValue}>#{rank}</span>
+                <span style={styles.statLabel}>Global Rank</span>
+            </div>
+        </div>
 
-      <p style={styles.version}>Sleep Compete v1.0.0</p>
+        {/* Actions */}
+        <div style={styles.actionList}>
+            <button style={styles.actionButton}>
+                <div style={styles.actionIconBg}><Users size={20} color="#2D3436" /></div>
+                <span style={styles.actionText}>Manage Friends</span>
+            </button>
+            
+            <button style={styles.actionButton} onClick={handleLogout}>
+                <div style={{...styles.actionIconBg, background: '#FFE5E5'}}>
+                    <LogOut size={20} color="#FF6B6B" />
+                </div>
+                <span style={{...styles.actionText, color: '#FF6B6B'}}>Log Out</span>
+            </button>
+        </div>
+
+        {/* Edit Button (Bottom or Inline?) User asked for "Edit button that works" */}
+        <div style={{ marginTop: 'auto' }}>
+            {isEditing ? (
+                <div style={styles.editActions}>
+                     <button style={styles.cancelButton} onClick={() => setIsEditing(false)}>Cancel</button>
+                     <button style={styles.saveButton} onClick={handleSave}>Save Changes</button>
+                </div>
+            ) : (
+                <button style={styles.floatingEditButton} onClick={() => setIsEditing(true)}>
+                    <Edit2 size={20} color="white" style={{marginRight: 10}} />
+                    Edit Profile
+                </button>
+            )}
+        </div>
+
+      </div>
     </div>
   );
 };
@@ -128,219 +106,193 @@ const ProfilePage = () => {
 const styles = {
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(180deg, #F5D799 0%, #FFF8E7 30%)',
-    paddingBottom: '100px',
+    background: '#FFF9EE',
+    color: '#2D3436',
+    display: 'flex',
+    flexDirection: 'column',
+    fontFamily: "'Inter', sans-serif",
   },
   header: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: '20px',
-    paddingTop: '40px',
+    padding: '24px 24px',
   },
   backButton: {
-    background: 'white',
+    background: 'none',
     border: 'none',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     cursor: 'pointer',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-  },
-  editButton: {
-    background: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    padding: 0
   },
   title: {
-    fontSize: '20px',
-    fontWeight: '600',
-    color: '#2D3436',
+    fontSize: '24px',
+    fontWeight: '700',
+    fontFamily: "'Lora', serif",
   },
-  profileCard: {
-    background: 'white',
-    borderRadius: '24px',
-    padding: '30px',
-    margin: '0 20px 20px',
-    textAlign: 'center',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+  content: {
+    flex: 1,
+    padding: '24px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-  avatarWrapper: {
-    position: 'relative',
-    display: 'inline-block',
+  
+  avatarSection: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: '32px',
   },
   avatarLarge: {
     width: '100px',
     height: '100px',
     borderRadius: '50%',
-    background: '#F5D799',
+    background: 'white',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     fontSize: '50px',
-    margin: '0 auto 16px',
-  },
-  avatarEditButton: {
-    position: 'absolute',
-    bottom: '16px',
-    right: '0',
-    width: '32px',
-    height: '32px',
-    borderRadius: '50%',
-    background: '#FF6B6B',
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    color: 'white',
+    boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+    marginBottom: '16px',
+    border: '4px solid white'
   },
   userName: {
     fontSize: '24px',
     fontWeight: '700',
     color: '#2D3436',
     marginBottom: '4px',
+    fontFamily: "'Lora', serif",
+  },
+  nameInput: {
+      fontSize: '24px',
+      fontWeight: '700',
+      color: '#2D3436',
+      marginBottom: '4px',
+      fontFamily: "'Lora', serif",
+      border: 'none',
+      borderBottom: '2px solid #2D3436',
+      background: 'transparent',
+      textAlign: 'center',
+      outline: 'none',
+      width: '200px'
   },
   userHandle: {
     fontSize: '14px',
-    color: '#636E72',
-    marginBottom: '8px',
-  },
-  streakLarge: {
-    fontSize: '16px',
-    color: '#FF6B6B',
+    color: '#B2BEC3',
     fontWeight: '500',
-    marginBottom: '24px',
   },
-  statsRow: {
+
+  statsCard: {
+    width: '100%',
+    background: 'white',
+    borderRadius: '24px',
+    padding: '20px 0',
     display: 'flex',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
+    boxShadow: '0 4px 15px rgba(0,0,0,0.03)',
+    marginBottom: '40px'
   },
-  profileStat: {
+  statItem: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    padding: '0 20px',
+    gap: '4px'
   },
-  profileStatValue: {
-    fontSize: '22px',
-    fontWeight: '700',
-    color: '#2D3436',
+  statValue: {
+    fontSize: '20px',
+    fontWeight: '800',
+    color: '#2D3436'
   },
-  profileStatLabel: {
-    fontSize: '12px',
-    color: '#636E72',
+  statLabel: {
+    fontSize: '11px',
+    color: '#B2BEC3',
+    fontWeight: '600',
+    textTransform: 'uppercase'
   },
-  statDivider: {
+  divider: {
     width: '1px',
-    height: '40px',
-    background: '#E0E0E0',
+    height: '32px',
+    background: '#F0F0F0'
   },
-  achievementsCard: {
+
+  actionList: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    marginBottom: 'auto'
+  },
+  actionButton: {
+    width: '100%',
     background: 'white',
-    borderRadius: '24px',
-    padding: '20px',
-    margin: '0 20px 20px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+    borderRadius: '20px',
+    padding: '16px 20px',
+    display: 'flex',
+    alignItems: 'center',
+    border: 'none',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.03)',
+    cursor: 'pointer',
+    transition: 'transform 0.1s'
   },
-  sectionTitle: {
+  actionIconBg: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '12px',
+    background: '#F5F6FA',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: '16px'
+  },
+  actionText: {
     fontSize: '16px',
     fontWeight: '600',
-    color: '#2D3436',
-    marginBottom: '16px',
+    color: '#2D3436'
   },
-  achievementsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: '10px',
+
+  // Edit Button Styles
+  floatingEditButton: {
+      background: '#2D3436',
+      color: 'white',
+      border: 'none',
+      borderRadius: '32px',
+      padding: '16px 32px',
+      fontSize: '16px',
+      fontWeight: '600',
+      display: 'flex',
+      alignItems: 'center',
+      boxShadow: '0 8px 24px rgba(45, 52, 54, 0.3)',
+      cursor: 'pointer',
+      marginTop: '20px',
+      marginBottom: '20px'
   },
-  achievement: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '12px 8px',
-    background: '#FFF9E6',
-    borderRadius: '16px',
+  editActions: {
+      display: 'flex',
+      gap: '12px',
+      marginTop: '20px',
+      marginBottom: '20px'
   },
-  lockedAchievement: {
-    background: '#F5F5F5',
-    opacity: 0.6,
+  saveButton: {
+      background: '#2D3436',
+      color: 'white',
+      border: 'none',
+      borderRadius: '32px',
+      padding: '16px 32px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer'
   },
-  achievementIcon: {
-    fontSize: '28px',
-    marginBottom: '6px',
-  },
-  achievementLabel: {
-    fontSize: '10px',
-    color: '#636E72',
-    textAlign: 'center',
-  },
-  menuCard: {
-    background: 'white',
-    borderRadius: '24px',
-    margin: '0 20px 20px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-    overflow: 'hidden',
-  },
-  menuItem: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '16px 20px',
-    borderBottom: '1px solid #F0F0F0',
-    cursor: 'pointer',
-  },
-  menuItemLeft: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '14px',
-  },
-  menuItemLabel: {
-    fontSize: '15px',
-    fontWeight: '500',
-    color: '#2D3436',
-  },
-  toggleSwitch: {
-    position: 'relative',
-    width: '50px',
-    height: '28px',
-  },
-  toggleInput: {
-    opacity: 0,
-    width: 0,
-    height: 0,
-  },
-  toggleSlider: {
-    position: 'absolute',
-    cursor: 'pointer',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: '#E0E0E0',
-    borderRadius: '28px',
-    transition: '0.3s',
-  },
-  toggleSliderActive: {
-    background: '#FF6B6B',
-  },
-  version: {
-    textAlign: 'center',
-    fontSize: '12px',
-    color: '#B0B0B0',
-    marginTop: '10px',
-  },
+  cancelButton: {
+      background: '#F5F6FA',
+      color: '#2D3436',
+      border: 'none',
+      borderRadius: '32px',
+      padding: '16px 24px',
+      fontSize: '16px',
+      fontWeight: '600',
+      cursor: 'pointer'
+  }
 };
 
 export default ProfilePage;

@@ -15,8 +15,33 @@ const AnalyticsPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [timeRange, setTimeRange] = useState('Today'); // 'Today', '1 Week', '1 Month'
 
+  // Edit Mode State
+  const [isEditing, setIsEditing] = useState(false);
+  const [overrides, setOverrides] = useState({});
+  const [editForm, setEditForm] = useState({ bedTime: '', wakeTime: '' });
+
   // 1. Get stats for Selected Date (Top Section)
-  const dailyData = useMemo(() => generateSleepData(currentUser.id, selectedDate), [selectedDate]);
+  const baseData = useMemo(() => generateSleepData(currentUser.id, selectedDate), [selectedDate]);
+  
+  // Apply overrides
+  const dailyData = useMemo(() => {
+     const key = selectedDate.toDateString();
+     return overrides[key] ? { ...baseData, ...overrides[key] } : baseData;
+  }, [baseData, overrides, selectedDate]);
+
+  const handleEditClick = () => {
+      if (!isEditing) {
+          setEditForm({ bedTime: dailyData.bedTime, wakeTime: dailyData.wakeTime });
+          setIsEditing(true);
+      } else {
+          // Save
+          setOverrides(prev => ({
+              ...prev,
+              [selectedDate.toDateString()]: { bedTime: editForm.bedTime, wakeTime: editForm.wakeTime }
+          }));
+          setIsEditing(false);
+      }
+  };
 
   // 2. Wrap dailyData into sleepStats structure but calculating breakdown based on TimeRange
   const { breakdown, currentGraph } = useMemo(() => {
@@ -102,14 +127,37 @@ const AnalyticsPage = () => {
             <div style={styles.timesHeaderRow}>
               <div style={styles.timeBlock}>
                 <span style={styles.timeLabel}>FALL ASLEEP</span>
-                <span style={styles.timeValue}>{sleepStats.fallAsleep}</span>
+                {isEditing ? (
+                    <input 
+                        type="time" 
+                        value={editForm.bedTime}
+                        onChange={(e) => setEditForm({...editForm, bedTime: e.target.value})}
+                        style={styles.timeInput}
+                    />
+                ) : (
+                    <span style={styles.timeValue}>{sleepStats.fallAsleep}</span>
+                )}
               </div>
               <div style={styles.timeBlock}>
                 <span style={styles.timeLabel}>WAKE UP</span>
-                <span style={styles.timeValue}>{sleepStats.wakeUp}</span>
+                {isEditing ? (
+                    <input 
+                        type="time" 
+                        value={editForm.wakeTime}
+                        onChange={(e) => setEditForm({...editForm, wakeTime: e.target.value})}
+                        style={styles.timeInput}
+                    />
+                ) : (
+                    <span style={styles.timeValue}>{sleepStats.wakeUp}</span>
+                )}
               </div>
             </div>
-            <button style={styles.editButton}>Edit data</button>
+            <button 
+                style={{...styles.editButton, background: isEditing ? '#97AF68' : '#262626'}} 
+                onClick={handleEditClick}
+            >
+                {isEditing ? 'Save Data' : 'Edit data'}
+            </button>
           </div>
 
           {/* Quality Card */}
@@ -330,6 +378,16 @@ const styles = {
     fontSize: '18px',
     fontWeight: '900',
     color: '#1A1A1A',
+  },
+  timeInput: {
+      fontSize: '16px',
+      fontWeight: '700',
+      color: '#1A1A1A',
+      background: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      padding: '4px',
+      width: '100px'
   },
   editButton: {
     background: '#262626',
