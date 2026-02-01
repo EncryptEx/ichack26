@@ -1,59 +1,81 @@
 // src/pages/AnalyticsPage.jsx
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Activity, Brain, Plus } from 'lucide-react';
 import Calendar from '../components/Calendar';
+import { currentUser, generateSleepData } from '../data/mockData';
+
+const formatDuration = (hours) => {
+  const h = Math.floor(hours);
+  const m = Math.round((hours - h) * 60);
+  if (h === 0) return `${m} min`;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')} h`;
+};
 
 const AnalyticsPage = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [timeRange, setTimeRange] = useState('Today'); // 'Today', '1 Week', '1 Month'
 
-  // Mock Data
+  // 1. Get stats for Selected Date (Top Section)
+  const dailyData = useMemo(() => generateSleepData(currentUser.id, selectedDate), [selectedDate]);
+
+  // 2. Wrap dailyData into sleepStats structure but calculating breakdown based on TimeRange
+  const { breakdown, currentGraph } = useMemo(() => {
+     let dataList = [];
+     let labels = [];
+     let bars = [];
+
+     // Helper for bar color
+     const getBarColor = (val) => val > 7 ? '#97AF68' : (val > 5 ? '#EA8323' : '#7E7E7E');
+
+     if (timeRange === 'Today') {
+        dataList = [dailyData];
+        // Mock hourly bars for visual effect
+        labels = [dailyData.bedTime + ' p.m.', dailyData.wakeTime + ' a.m.'];
+        bars = Array(21).fill(0).map(() => {
+           const h = Math.random() * 80;
+           return { h, color: h > 50 ? '#97AF68' : '#EA8323' };
+        });
+     } else {
+        const days = timeRange === '1 Week' ? 7 : 30;
+        labels = timeRange === '1 Week' ? ['Mon', 'Sun'] : ['1st', '30th'];
+        
+        // Generate history
+        for (let i = days - 1; i >= 0; i--) {
+            const d = new Date(selectedDate);
+            d.setDate(d.getDate() - i);
+            const dayStats = generateSleepData(currentUser.id, d);
+            dataList.push(dayStats);
+            bars.push({
+                h: Math.min((dayStats.sleepHours / 10) * 100, 100),
+                color: getBarColor(dayStats.sleepHours)
+            });
+        }
+     }
+
+     // Calculate Average Breakdown
+     const avgDeep = dataList.reduce((acc, d) => acc + d.deepSleep, 0) / dataList.length;
+     const avgLight = dataList.reduce((acc, d) => acc + d.lightSleep + d.remSleep, 0) / dataList.length; 
+     const avgAwake = dataList.reduce((acc, d) => acc + (d.sleepHours * 0.15), 0) / dataList.length; // Mock ~15% awake
+     
+     const total = avgDeep + avgLight + avgAwake;
+
+     return {
+         currentGraph: { labels, bars },
+         breakdown: {
+            awake: { time: formatDuration(avgAwake), percent: avgAwake/total, color: '#7E7E7E' },
+            light: { time: formatDuration(avgLight), percent: avgLight/total, color: '#97AF68' },
+            deep: { time: formatDuration(avgDeep), percent: avgDeep/total, color: '#EA8323' }
+         }
+     };
+  }, [selectedDate, timeRange, dailyData]);
+
   const sleepStats = {
-    total: 8.25,
-    fallAsleep: '11:22 PM',
-    wakeUp: '07:22 AM',
-    quality: 67,
-    breakdown: {
-      awake: { time: '14 min', percent: 0.15, color: '#7E7E7E' },
-      light: { time: '05:45 h', percent: 0.75, color: '#97AF68' },
-      deep: { time: '01:30 h', percent: 0.45, color: '#EA8323' }
-    }
+    total: dailyData.sleepHours,
+    fallAsleep: dailyData.bedTime + (parseInt(dailyData.bedTime.split(':')[0]) >= 12 ? ' PM' : ' AM'),
+    wakeUp: dailyData.wakeTime + ' AM',
+    quality: dailyData.sleepQuality,
+    breakdown
   };
-
-  // Data for different time ranges
-  const graphData = {
-    'Today': {
-      labels: ['11:22 p.m.', '07.12 am'],
-      bars: [
-        { h: 30, color: '#7E7E7E' }, { h: 60, color: '#97AF68' }, { h: 60, color: '#97AF68' },
-        { h: 40, color: '#97AF68' }, { h: 50, color: '#EA8323' }, { h: 50, color: '#EA8323' },
-        { h: 60, color: '#97AF68' }, { h: 50, color: '#97AF68' }, { h: 80, color: '#97AF68' },
-        { h: 30, color: '#7E7E7E' }, { h: 60, color: '#EA8323' }, { h: 65, color: '#EA8323' },
-        { h: 20, color: '#97AF68' }, { h: 80, color: '#97AF68' }, { h: 50, color: '#7E7E7E' },
-        { h: 20, color: '#7E7E7E' }, { h: 65, color: '#97AF68' }, { h: 70, color: '#97AF68' },
-        { h: 30, color: '#EA8323' }, { h: 60, color: '#97AF68' }, { h: 60, color: '#97AF68' }
-      ]
-    },
-    '1 Week': {
-      labels: ['Mon', 'Sun'],
-      bars: [
-        { h: 70, color: '#97AF68' }, { h: 85, color: '#97AF68' }, { h: 60, color: '#EA8323' },
-        { h: 90, color: '#97AF68' }, { h: 75, color: '#EA8323' }, { h: 50, color: '#7E7E7E' },
-        { h: 95, color: '#97AF68' }
-      ]
-    },
-    '1 Month': {
-      labels: ['1st', '30th'],
-      bars: [
-        { h: 60, color: '#97AF68' }, { h: 50, color: '#97AF68' }, { h: 70, color: '#EA8323' },
-        { h: 80, color: '#97AF68' }, { h: 65, color: '#97AF68' }, { h: 40, color: '#7E7E7E' },
-        { h: 85, color: '#EA8323' }, { h: 55, color: '#97AF68' }, { h: 75, color: '#97AF68' },
-        { h: 90, color: '#97AF68' }, { h: 45, color: '#7E7E7E' }, { h: 60, color: '#EA8323' }
-      ]
-    }
-  };
-
-  const currentGraph = graphData[timeRange];
 
   return (
     <div style={styles.container}>

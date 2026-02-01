@@ -26,6 +26,16 @@ export const generateSleepData = (userId, date) => {
   // Determine if points went up or down (based on seed for consistency)
   const pointsChange = (seed % 3 === 0) ? 'down' : 'up';
   
+  // Randomize times slightly based on seed
+  const bedHour = (22 + (seed % 3)) % 24;
+  const bedMin = (seed * 7) % 60;
+  const wakeHour = 6 + (seed % 3); 
+  const wakeMin = (seed * 11) % 60;
+
+  const pad = (n) => n.toString().padStart(2, '0');
+  const bedTime = `${pad(bedHour)}:${pad(bedMin)}`;
+  const wakeTime = `${pad(wakeHour)}:${pad(wakeMin)}`;
+  
   return {
     userId,
     date: date.toISOString(),
@@ -33,8 +43,8 @@ export const generateSleepData = (userId, date) => {
     sleepQuality: Math.min(100, sleepQuality),
     points,
     pointsChange,
-    bedTime: '23:30',
-    wakeTime: '07:48',
+    bedTime,
+    wakeTime,
     deepSleep: parseFloat((sleepHours * 0.2).toFixed(1)),
     remSleep: parseFloat((sleepHours * 0.25).toFixed(1)),
     lightSleep: parseFloat((sleepHours * 0.55).toFixed(1)),

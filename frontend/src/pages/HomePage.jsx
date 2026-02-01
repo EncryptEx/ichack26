@@ -99,8 +99,8 @@ const styles = {
   header: { padding: '32px 36px 8px', flexShrink: 0 },
   greeting: { fontSize: '32px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", margin: 0 },
   sleepSection: { padding: '8px 0', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' },
-  sectionTitle: { fontSize: '22px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", marginBottom: '16px', paddingLeft: '36px' },
-  sleepScrollContainer: { flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingLeft: '36px', paddingRight: '24px', marginRight: '8px' },
+  sectionTitle: { fontSize: '22px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", marginBottom: '16px', paddingLeft: '24px' },
+  sleepScrollContainer: { flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingLeft: '24px', paddingRight: '24px', marginRight: '8px' },
 };
 
 export default HomePage;

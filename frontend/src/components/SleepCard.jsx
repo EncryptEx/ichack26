@@ -231,10 +231,10 @@ const styles = {
     fontSize: '20px',
   },
   pointsLarge: {
-    fontSize: '26px',
+    fontSize: '22px',
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: '16px',
+    marginBottom: '12px',
   },
   statsRowLarge: {
     display: 'flex',

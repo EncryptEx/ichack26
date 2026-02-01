@@ -47,7 +47,6 @@ const DreamLog = ({ dreams, onAddDream }) => {
                   {isMyDream && <div style={styles.newBadge} />}
                 </div>
                 <p style={styles.dreamContent}>{dream.content}</p>
-                <span style={styles.dreamTime}>Last night</span>
             </div>
           );
         })}
@@ -96,7 +95,7 @@ const DreamLog = ({ dreams, onAddDream }) => {
 
 const styles = {
   container: { 
-    padding: '16px 0 85px', 
+    padding: '8px 0 110px', 
     flexShrink: 0 
   },
   title: { 

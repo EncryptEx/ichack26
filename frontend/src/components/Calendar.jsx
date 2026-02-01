@@ -82,7 +82,7 @@ const Calendar = ({ selectedDate, onDateSelect }) => {
 
 const styles = {
   container: {
-    padding: '16px 36px 32px',
+    padding: '8px 36px 16px',
     flexShrink: 0,
   },
   header: {
