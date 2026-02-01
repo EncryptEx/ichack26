@@ -2,7 +2,6 @@ import { useState, useMemo } from 'react';
 import Calendar from '../components/Calendar';
 import SleepCard from '../components/SleepCard';
 import DreamLog from '../components/DreamLog';
-import Navigation from '../components/Navigation';
 // Import initial data from your mock file
 import { currentUser, friends, dreams as initialDreams, generateSleepData } from '../data/mockData';
 
@@ -89,17 +88,16 @@ const HomePage = () => {
             onAddDream={handleAddDream}
         />
       </div>
-      <Navigation />
     </div>
   );
 };
 
 const styles = {
   container: { height: '100vh', maxHeight: '100vh', overflow: 'hidden', background: '#FFF9EE', position: 'relative' },
-  yellowBackground: { position: 'absolute', top: 0, left: 0, right: 0, height: '320px', background: '#FFCA5F', zIndex: 0 },
-  content: { position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: '90px' },
-  header: { padding: '40px 36px 12px', flexShrink: 0 },
-  greeting: { fontSize: '42px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", margin: 0 },
+  yellowBackground: { position: 'absolute', top: 0, left: 0, right: 0, height: '280px', background: '#FFCA5F', zIndex: 0 },
+  content: { position: 'relative', zIndex: 1, height: '100%', display: 'flex', flexDirection: 'column', paddingBottom: '0' },
+  header: { padding: '32px 36px 8px', flexShrink: 0 },
+  greeting: { fontSize: '32px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", margin: 0 },
   sleepSection: { padding: '8px 0', flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, overflow: 'hidden' },
   sectionTitle: { fontSize: '22px', fontWeight: '700', color: '#2D3436', fontFamily: "'Lora', serif", marginBottom: '16px', paddingLeft: '36px' },
   sleepScrollContainer: { flex: 1, overflowY: 'auto', overflowX: 'hidden', paddingLeft: '36px', paddingRight: '24px', marginRight: '8px' },

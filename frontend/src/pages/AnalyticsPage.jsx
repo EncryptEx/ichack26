@@ -1,7 +1,6 @@
 // src/pages/AnalyticsPage.jsx
 import { useState } from 'react';
 import { Activity, Brain, Plus } from 'lucide-react';
-import Navigation from '../components/Navigation';
 import Calendar from '../components/Calendar';
 
 const AnalyticsPage = () => {
@@ -152,7 +151,6 @@ const AnalyticsPage = () => {
         </div>
 
       </div>
-      <Navigation />
     </div>
   );
 };
