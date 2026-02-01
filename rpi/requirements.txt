@@ -2,3 +2,6 @@ gpiozero
 RPi.GPIO
 requests
 python-dotenv
+# OLED Display
+adafruit-circuitpython-ssd1306
+Pillow

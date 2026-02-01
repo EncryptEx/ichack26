@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, date, timedelta
 from typing import List, Optional
 
 from ..database import get_db
 from ..models import (
     User, SleepSession, SleepSessionCreate, SleepSessionResponse,
     SleepSessionEnd, SleepWindow, SleepSummaryResponse, SleepInterval,
-    SleepStageEstimates
+    SleepStageEstimates, DaySleepResponse
 )
 from ..auth import get_current_user
 from ..sleep_computation import generate_intervals
@@ -168,6 +168,133 @@ def get_session_summary(
         )
     
     return _build_session_summary(session, current_user, db)
+
+
+@router.get("/day/{day_date}", response_model=DaySleepResponse)
+def get_sleep_by_day(
+    day_date: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all sleep data for a specific day (YYYY-MM-DD format).
+    The frontend can request data for any specific day.
+    
+    A sleep session belongs to a day based on when it STARTED.
+    """
+    from sqlalchemy import func
+    
+    try:
+        target_date = datetime.strptime(day_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid date format. Use YYYY-MM-DD"
+        )
+    
+    # Get all completed sessions that started on this day
+    sessions = db.query(SleepSession).filter(
+        SleepSession.user_id == current_user.id,
+        func.date(SleepSession.start_time) == target_date,
+        SleepSession.end_time.isnot(None)
+    ).order_by(SleepSession.start_time).all()
+    
+    # Build summaries for each session
+    session_summaries = [
+        _build_session_summary(session, current_user, db)
+        for session in sessions
+    ]
+    
+    # Calculate daily aggregates
+    total_hours = sum(s.hours_slept for s in session_summaries)
+    total_points = sum(s.points_earned for s in session_summaries)
+    avg_quality = int(sum(s.sleep_quality for s in session_summaries) / len(session_summaries)) if session_summaries else 0
+    total_awakenings = sum(s.awakenings_count for s in session_summaries)
+    
+    # Get points delta vs yesterday
+    yesterday = target_date - timedelta(days=1)
+    yesterday_points = db.query(func.sum(SleepSession.points_earned)).filter(
+        SleepSession.user_id == current_user.id,
+        func.date(SleepSession.start_time) == yesterday
+    ).scalar() or 0
+    
+    points_delta = total_points - yesterday_points
+    
+    # Get current rank
+    current_rank = _get_user_rank(current_user.id, db)
+    
+    return DaySleepResponse(
+        date=day_date,
+        sessions=session_summaries,
+        total_hours_slept=round(total_hours, 2),
+        total_points_earned=total_points,
+        average_quality=avg_quality,
+        total_awakenings=total_awakenings,
+        points_delta_vs_yesterday=points_delta,
+        current_rank=current_rank
+    )
+
+
+@router.get("/days", response_model=List[DaySleepResponse])
+def get_sleep_by_date_range(
+    start_date: str = Query(..., description="Start date (YYYY-MM-DD)"),
+    end_date: str = Query(..., description="End date (YYYY-MM-DD)"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get sleep data for a date range. Returns a list of daily summaries.
+    Useful for calendar views.
+    """
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid date format. Use YYYY-MM-DD"
+        )
+    
+    if end < start:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="End date must be after start date"
+        )
+    
+    # Limit range to 31 days to prevent abuse
+    if (end - start).days > 31:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Date range cannot exceed 31 days"
+        )
+    
+    results = []
+    current_date = start
+    
+    while current_date <= end:
+        day_str = current_date.strftime("%Y-%m-%d")
+        day_response = get_sleep_by_day(day_str, current_user, db)
+        results.append(day_response)
+        current_date += timedelta(days=1)
+    
+    return results
+
+
+def _get_user_rank(user_id: int, db: Session) -> int:
+    """Get user's current rank by total points."""
+    from sqlalchemy import func
+    
+    user_totals = db.query(
+        SleepSession.user_id,
+        func.sum(SleepSession.points_earned).label("total")
+    ).group_by(SleepSession.user_id).order_by(
+        func.sum(SleepSession.points_earned).desc()
+    ).all()
+    
+    for i, (uid, _) in enumerate(user_totals, 1):
+        if uid == user_id:
+            return i
+    return 1
 
 
 def _build_session_summary(

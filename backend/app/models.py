@@ -257,6 +257,22 @@ class SleepSummaryResponse(BaseModel):
     intervals: List[SleepInterval]
 
 
+class DaySleepResponse(BaseModel):
+    """Day-based sleep summary for frontend calendar view."""
+    date: str  # YYYY-MM-DD format
+    sessions: List[SleepSummaryResponse]
+    
+    # Daily aggregates
+    total_hours_slept: float
+    total_points_earned: int
+    average_quality: int
+    total_awakenings: int
+    
+    # Comparison
+    points_delta_vs_yesterday: int
+    current_rank: int
+
+
 # Dream Log Models
 class DreamLogBase(BaseModel):
     title: str
@@ -281,6 +297,13 @@ class DreamLogResponse(DreamLogBase):
     
     class Config:
         from_attributes = True
+
+
+class DayDreamsResponse(BaseModel):
+    """Day-based dream log summary for frontend."""
+    date: str  # YYYY-MM-DD format
+    dreams: List[DreamLogResponse]
+    total_entries: int
 
 
 # Analytics Models

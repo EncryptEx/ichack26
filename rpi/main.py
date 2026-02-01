@@ -18,6 +18,7 @@ import config
 from sensor import sensor
 from state_machine import SleepStateMachine, SessionState
 from api_client import api_client
+from oled_display import oled_display
 
 # Configure logging - use local file instead of /var/log
 LOG_FILE = os.path.join(os.path.dirname(__file__), "recharge-royale.log")
@@ -58,10 +59,15 @@ def main():
     logger.info(f"User ID: {config.USER_ID}")
     logger.info(f"Sample rate: {config.SAMPLE_RATE_HZ} Hz")
     logger.info(f"Window duration: {config.WINDOW_DURATION_SECONDS}s")
+    logger.info(f"OLED display: {'MOCK' if oled_display.is_mock else 'HARDWARE'}")
     logger.info("=" * 60)
     
     # Initialize state machine
     state_machine = SleepStateMachine(user_id=config.USER_ID)
+    
+    # Start OLED display thread
+    oled_display.start()
+    oled_display.show_message("Recharge Royale", "Starting up...", "Sleep Tracker v1.0")
     
     # Tracking variables
     last_sample_time = time.time()
@@ -85,6 +91,21 @@ def main():
             # Process sensor sample
             window = state_machine.process_sample()
             current_state = state_machine.state
+            
+            # Get current sensor data for display
+            distance = sensor.get_filtered_distance()
+            session = state_machine.get_session_data()
+            session_start = session.start_ts if session else None
+            movement_energy = window.movement_energy if window else 0.0
+            
+            # Update OLED display
+            oled_display.update_state(
+                state_name=current_state.name,
+                session_active=(current_state == SessionState.IN_BED),
+                session_start_ts=session_start,
+                distance=distance,
+                movement_energy=movement_energy
+            )
             
             # Log state transitions
             if current_state != last_state:
@@ -135,6 +156,12 @@ def main():
     
     # Graceful shutdown
     logger.info("Shutting down...")
+    
+    # Show shutdown message on OLED
+    oled_display.show_message("Shutting down...", "", "Goodbye!")
+    
+    # Stop OLED display thread
+    oled_display.stop()
     
     # End any active session
     if state_machine.state not in (SessionState.IDLE, SessionState.ENDED):
