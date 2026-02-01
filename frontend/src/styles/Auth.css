@@ -100,11 +100,13 @@
     box-sizing: border-box; /* Important for padding */
 }
 
-.form-group input:focus,
 .form-group input:hover {
-    outline: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Appears on hover/focus */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Appears on hover only */
     transform: translateY(-1px);
+}
+
+.form-group input:focus {
+    outline: none;
 }
 
 .auth-button {
