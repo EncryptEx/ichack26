@@ -86,6 +86,9 @@ class DistanceSensor:
             alpha = config.EMA_ALPHA
             self._ema_value = alpha * median_val + (1 - alpha) * self._ema_value
         
+        # Debug logging for distance readings
+        logger.info(f"DISTANCE | raw={raw:.3f}m ({raw*100:.1f}cm) | median={median_val:.3f}m | ema={self._ema_value:.3f}m ({self._ema_value*100:.1f}cm)")
+        
         return self._ema_value
     
     def _get_mock_distance(self) -> float:
