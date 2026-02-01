@@ -65,13 +65,14 @@ def main():
     state_machine = SleepStateMachine(user_id=config.USER_ID)
     
     # Start OLED display subprocess
-    oled_script = os.path.join(os.path.dirname(__file__), "oled_display.py")
+    oled_script = os.path.join(os.path.dirname(os.path.abspath(__file__)), "oled_display.py")
+    logger.info(f"OLED script path: {oled_script}")
     oled_process = None
     try:
         oled_process = subprocess.Popen(
             [sys.executable, oled_script],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
         )
         logger.info(f"OLED display subprocess started (PID: {oled_process.pid})")
     except Exception as e:
