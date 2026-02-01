@@ -5,19 +5,20 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
-  background: linear-gradient(180deg, #F5D799 0%, #FFF8E7 30%);
+  font-family: 'Inter', sans-serif;
+  background: #FFF9EE;
   min-height: 100vh;
 }
 
 :root {
-  --primary-yellow: #F5D799;
-  --light-yellow: #FFF8E7;
-  --coral: #FF6B6B;
-  --coral-light: #FFE5E5;
-  --blue-light: #E8F4FF;
+  --primary-yellow: #FFCA5F;
+  --light-yellow: #FFF9EE;
+  --coral: #E54D4D;
+  --coral-light: #FFE0DC;
+  --blue-light: #DCE9F5;
+  --blue: #5B93CC;
   --text-dark: #2D3436;
-  --text-gray: #636E72;
+  --text-gray: #7A8289;
   --white: #FFFFFF;
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
@@ -45,4 +46,63 @@ body {
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Sleep list scrollbar - visible rounded style like in reference */
+.sleep-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sleep-scroll::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  margin: 4px 0;
+}
+
+.sleep-scroll::-webkit-scrollbar-thumb {
+  background: #B8BFC4;
+  border-radius: 10px;
+}
+
+.sleep-scroll::-webkit-scrollbar-thumb:hover {
+  background: #9EA5AB;
+}
+
+/* Custom scrollbar for sleep list to match design */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #B2BEC3; /* Grey color from design */
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #636E72;
+}
+
+/* Bottom sheet animation */
+@keyframes slideUp {
+  from {
+    transform: translateX(-50%) translateY(100%);
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Recording pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }

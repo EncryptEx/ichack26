@@ -12,6 +12,9 @@ export const friends = [
   { id: 'user3', name: 'Jaume', avatar: '👨', streak: 2 },
   { id: 'user4', name: 'Sofia', avatar: '👧', streak: 8 },
   { id: 'user5', name: 'Marcus', avatar: '🧔', streak: 12 },
+  { id: 'user6', name: 'Emma', avatar: '👱‍♀️', streak: 6 },
+  { id: 'user7', name: 'Lucas', avatar: '👦', streak: 3 },
+  { id: 'user8', name: 'Mia', avatar: '👩‍🦰', streak: 9 },
 ];
 
 export const generateSleepData = (userId, date) => {
@@ -20,18 +23,41 @@ export const generateSleepData = (userId, date) => {
   const sleepHours = 5 + (seed % 5) + (Math.random() * 2);
   const sleepQuality = 40 + (seed % 50) + Math.floor(Math.random() * 10);
   const points = Math.floor(sleepHours * 10 + sleepQuality * 0.5);
+  // Determine if points went up or down (based on seed for consistency)
+  const pointsChange = (seed % 3 === 0) ? 'down' : 'up';
   
+  // Randomize times slightly based on seed
+  const bedHour = (22 + (seed % 3)) % 24;
+  const bedMin = (seed * 7) % 60;
+  const wakeHour = 6 + (seed % 3); 
+  const wakeMin = (seed * 11) % 60;
+
+  const pad = (n) => n.toString().padStart(2, '0');
+  const bedTime = `${pad(bedHour)}:${pad(bedMin)}`;
+  const wakeTime = `${pad(wakeHour)}:${pad(wakeMin)}`;
+  
+  // Vary ratios to make charts look dynamic
+  // Deep sleep: 15-30%
+  // REM: 15-25%
+  // Light: Remaining
+  const deepRatio = 0.15 + ((seed * 7 % 15) / 100);
+  const remRatio = 0.15 + ((seed * 3 % 10) / 100);
+  const deep = parseFloat((sleepHours * deepRatio).toFixed(1));
+  const rem = parseFloat((sleepHours * remRatio).toFixed(1));
+  const light = parseFloat((sleepHours - deep - rem).toFixed(1));
+
   return {
     userId,
     date: date.toISOString(),
     sleepHours: parseFloat(sleepHours.toFixed(1)),
     sleepQuality: Math.min(100, sleepQuality),
     points,
-    bedTime: '23:30',
-    wakeTime: '07:48',
-    deepSleep: parseFloat((sleepHours * 0.2).toFixed(1)),
-    remSleep: parseFloat((sleepHours * 0.25).toFixed(1)),
-    lightSleep: parseFloat((sleepHours * 0.55).toFixed(1)),
+    pointsChange,
+    bedTime,
+    wakeTime,
+    deepSleep: deep,
+    remSleep: rem,
+    lightSleep: light,
   };
 };
 

@@ -82,7 +82,8 @@ const Calendar = ({ selectedDate, onDateSelect }) => {
 
 const styles = {
   container: {
-    padding: '20px 10px',
+    padding: '8px 36px 16px',
+    flexShrink: 0,
   },
   header: {
     display: 'flex',
@@ -93,10 +94,11 @@ const styles = {
   navButton: {
     background: 'none',
     border: 'none',
-    fontSize: '24px',
+    fontSize: '20px',
     cursor: 'pointer',
     color: '#2D3436',
-    padding: '5px 10px',
+    padding: '4px 8px',
+    opacity: 0.6,
   },
   daysRow: {
     display: 'flex',
@@ -104,28 +106,31 @@ const styles = {
     flex: 1,
   },
   dayLabel: {
-    fontSize: '14px',
+    fontSize: '15px',
     color: '#2D3436',
-    width: '40px',
+    width: '52px',
     textAlign: 'center',
+    fontFamily: "'Inter', sans-serif",
+    fontWeight: '600',
   },
   datesRow: {
     display: 'flex',
-    justifyContent: 'space-around',
-    paddingLeft: '30px',
-    paddingRight: '30px',
+    justifyContent: 'space-between',
+    paddingLeft: '0',
+    paddingRight: '0',
   },
   dateButton: {
-    width: '40px',
-    height: '40px',
+    width: '52px',
+    height: '52px',
     borderRadius: '50%',
     border: 'none',
-    background: 'transparent',
-    fontSize: '16px',
-    fontWeight: '500',
+    background: 'white',
+    fontSize: '20px',
+    fontWeight: '600',
     cursor: 'pointer',
     color: '#2D3436',
-    fontFamily: 'Poppins, sans-serif',
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
   },
   selectedDate: {
     background: '#2D3436',

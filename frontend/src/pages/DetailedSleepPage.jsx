@@ -1,356 +1,305 @@
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, Clock, Zap, MessageCircle, Send } from 'lucide-react';
-import { getUserById, generateSleepData, comments as initialComments, currentUser } from '../data/mockData';
+import { Activity, Brain, Plus, ChevronLeft, Moon, MessageCircle, Send } from 'lucide-react';
+import { currentUser, friends, dreams } from '../data/mockData'; // Assuming you have this or use the mock below
 
 const DetailedSleepPage = () => {
-  const { userId, date } = useParams();
+  const { userId } = useParams();
   const navigate = useNavigate();
-  const [newComment, setNewComment] = useState('');
-  const [comments, setComments] = useState(initialComments);
-
-  const user = getUserById(userId);
-  const sleepDate = new Date(date);
-  const sleepData = useMemo(() => generateSleepData(userId, sleepDate), [userId, date]);
+  const [commentText, setCommentText] = useState('');
   
-  const isCurrentUser = userId === currentUser.id;
-  const recordId = `${userId}-${date}`;
-  const recordComments = comments.filter(c => c.sleepRecordId === recordId);
+  // Find user (Mock logic)
+  const allUsers = [currentUser, ...friends];
+  const user = allUsers.find(u => u.id === userId) || currentUser;
+  const isCurrentUser = user.id === currentUser.id;
+  
+  // Mock Data specific to this view - WITH PROPER PERCENTAGE CALCULATION
+  const deepSleepHours = 2.4;
+  const lightSleepHours = 4.3;
+  const awakeHours = 0.8;
+  const totalHours = deepSleepHours + lightSleepHours + awakeHours;
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    
-    const comment = {
-      id: Date.now(),
-      sleepRecordId: recordId,
-      userId: currentUser.id,
-      userName: currentUser.name,
-      content: newComment,
-      timestamp: new Date().toISOString(),
-    };
-    
-    setComments([...comments, comment]);
-    setNewComment('');
+  const sleepStats = {
+    total: totalHours.toFixed(1),
+    fallAsleep: '11:45 PM',
+    wakeUp: '07:15 AM',
+    quality: 72,
+    breakdown: {
+      awake: { 
+        time: `${Math.floor(awakeHours * 60)} min`, 
+        percent: awakeHours / totalHours, 
+        color: '#7E7E7E' 
+      },
+      light: { 
+        time: `${String(Math.floor(lightSleepHours)).padStart(2, '0')}:${String(Math.round((lightSleepHours % 1) * 60)).padStart(2, '0')} h`, 
+        percent: lightSleepHours / totalHours, 
+        color: '#97AF68' 
+      },
+      deep: { 
+        time: `${String(Math.floor(deepSleepHours)).padStart(2, '0')}:${String(Math.round((deepSleepHours % 1) * 60)).padStart(2, '0')} h`, 
+        percent: deepSleepHours / totalHours, 
+        color: '#EA8323' 
+      }
+    }
   };
 
-  const totalSleep = sleepData.sleepHours;
-  const deepPercent = (sleepData.deepSleep / totalSleep) * 100;
-  const remPercent = (sleepData.remSleep / totalSleep) * 100;
-  const lightPercent = (sleepData.lightSleep / totalSleep) * 100;
+  // Check if this user had a dream logged for this "date"
+  // For demo purposes, we just check if it's the friend "Alex" or "Sarah"
+  const userDream = dreams.find(d => d.userId === userId);
+
+  const [comments, setComments] = useState([
+    { id: 1, user: 'Sarah', avatar: '👩🏻', text: 'Great streak! 🔥', time: '2h ago' },
+    { id: 2, user: 'Mike', avatar: '🧔🏻‍♂️', text: 'How do you get so much deep sleep??', time: '1h ago' }
+  ]);
+
+  const handlePostComment = () => {
+    if (!commentText.trim()) return;
+    const newComment = {
+      id: Date.now(),
+      user: 'You',
+      avatar: currentUser.avatar,
+      text: commentText,
+      time: 'Just now'
+    };
+    setComments([...comments, newComment]);
+    setCommentText('');
+  };
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <button onClick={() => navigate(-1)} style={styles.backButton}>
-          <ArrowLeft size={24} />
-        </button>
-        <h1 style={styles.title}>
-          {isCurrentUser ? 'Your Sleep' : `${user?.name}'s Sleep`}
-        </h1>
-        <div style={{ width: 40 }} />
-      </header>
-
-      <div style={styles.dateDisplay}>
-        {sleepDate.toLocaleDateString('en-US', { 
-          weekday: 'long', 
-          month: 'long', 
-          day: 'numeric' 
-        })}
-      </div>
-
-      <div style={styles.scoreCard}>
-        <div style={styles.pointsCircle}>
-          <span style={styles.points}>+{sleepData.points}</span>
-          <span style={styles.pointsLabel}>points</span>
-        </div>
-        <div style={styles.streakBadge}>
-          🔥 {user?.streak} day streak
+      {/* Yellow Header with Back Button */}
+      <div style={styles.topSection}>
+        <div style={styles.navHeader}>
+          <button onClick={() => navigate(-1)} style={styles.backButton}>
+            <ChevronLeft size={28} color="#2D3436" />
+          </button>
         </div>
       </div>
 
-      <div style={styles.statsGrid}>
-        <div style={styles.statCard}>
-          <Moon size={24} color="#6C5CE7" />
-          <span style={styles.statValue}>{sleepData.bedTime}</span>
-          <span style={styles.statLabel}>Bedtime</span>
+      {/* "Name Slept for" Card - Merged Cutout Style */}
+      <div style={styles.sleptForCard}>
+        <div style={styles.avatarContainer}>
+            <span style={{fontSize: '32px'}}>{user.avatar}</span>
         </div>
-        <div style={styles.statCard}>
-          <Sun size={24} color="#FDCB6E" />
-          <span style={styles.statValue}>{sleepData.wakeTime}</span>
-          <span style={styles.statLabel}>Wake up</span>
-        </div>
-        <div style={styles.statCard}>
-          <Clock size={24} color="#00B894" />
-          <span style={styles.statValue}>{sleepData.sleepHours}h</span>
-          <span style={styles.statLabel}>Duration</span>
-        </div>
-        <div style={styles.statCard}>
-          <Zap size={24} color="#E17055" />
-          <span style={styles.statValue}>{sleepData.sleepQuality}%</span>
-          <span style={styles.statLabel}>Quality</span>
+        <h2 style={styles.sleptForTitle}>
+            {isCurrentUser ? "You slept for" : `${user.name.split(' ')[0]} slept for`}
+        </h2>
+        <div style={styles.sleptForValue}>
+          {sleepStats.total}<span style={styles.sleptForUnit}>h</span>
         </div>
       </div>
 
-      <div style={styles.sleepStagesCard}>
-        <h3 style={styles.sectionTitle}>Sleep Stages</h3>
-        <div style={styles.stagesBar}>
-          <div style={{ ...styles.stageSegment, width: `${deepPercent}%`, background: '#6C5CE7' }} />
-          <div style={{ ...styles.stageSegment, width: `${remPercent}%`, background: '#00B894' }} />
-          <div style={{ ...styles.stageSegment, width: `${lightPercent}%`, background: '#74B9FF' }} />
-        </div>
-        <div style={styles.stagesLegend}>
-          <div style={styles.legendItem}>
-            <div style={{ ...styles.legendDot, background: '#6C5CE7' }} />
-            <span>Deep ({sleepData.deepSleep}h)</span>
+      <div style={styles.content}>
+        {/* Stats Row */}
+        <div style={styles.statsRow}>
+          {/* Times Card - No Edit Button */}
+          <div style={styles.timesCard}>
+            <div style={styles.timesHeaderRow}>
+              <div style={styles.timeBlock}>
+                <span style={styles.timeLabel}>FALL ASLEEP</span>
+                <span style={styles.timeValue}>{sleepStats.fallAsleep}</span>
+              </div>
+              <div style={styles.timeBlock}>
+                <span style={styles.timeLabel}>WAKE UP</span>
+                <span style={styles.timeValue}>{sleepStats.wakeUp}</span>
+              </div>
+            </div>
           </div>
-          <div style={styles.legendItem}>
-            <div style={{ ...styles.legendDot, background: '#00B894' }} />
-            <span>REM ({sleepData.remSleep}h)</span>
-          </div>
-          <div style={styles.legendItem}>
-            <div style={{ ...styles.legendDot, background: '#74B9FF' }} />
-            <span>Light ({sleepData.lightSleep}h)</span>
+
+          {/* Quality Card */}
+          <div style={styles.qualityCard}>
+            <span style={styles.qualityLabel}>Sleep Quality</span>
+            <div style={styles.qualityValueContainer}>
+              <span style={styles.qualityNumber}>{sleepStats.quality}</span>
+              <span style={styles.qualityPercent}>%</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      {!isCurrentUser && (
+        {/* Dream Section */}
+        <h3 style={styles.sectionTitle}>Tonight's Dream</h3>
+        <div style={styles.dreamCard}>
+          {userDream ? (
+            <>
+              <div style={styles.dreamHeader}>
+                <Moon size={20} color="#6B4C9A" fill="#6B4C9A" />
+                <span style={styles.dreamLabel}>Recorded Dream</span>
+              </div>
+              <p style={styles.dreamText}>"{userDream.content}"</p>
+            </>
+          ) : (
+             <div style={styles.emptyDreamState}>
+               <Moon size={32} color="#CBD5E1" />
+               <p style={styles.emptyDreamText}>No dreams recorded for this night.</p>
+             </div>
+          )}
+        </div>
+
+        {/* Sleep Insights (Read Only) */}
+        <h3 style={styles.sectionTitle}>Sleep Insights</h3>
+        <div style={styles.insightsCard}>
+          <div style={styles.chartContainer}>
+            <RingChart stats={sleepStats.breakdown} />
+          </div>
+          <div style={styles.legendRow}>
+            <LegendItem label="AWAKE" time={sleepStats.breakdown.awake.time} color="#9BB16A" icon={Activity} />
+            <LegendItem label="LIGHT" time={sleepStats.breakdown.light.time} color="#EA8323" icon={Brain} />
+            <LegendItem label="DEEP" time={sleepStats.breakdown.deep.time} color="#737373" icon={Plus} />
+          </div>
+        </div>
+
+        {/* Comment Section */}
+        <h3 style={styles.sectionTitle}>Friends' Activity</h3>
         <div style={styles.commentsSection}>
-          <h3 style={styles.sectionTitle}>
-            <MessageCircle size={20} style={{ marginRight: 8 }} />
-            Comments
-          </h3>
-          
           <div style={styles.commentsList}>
-            {recordComments.length === 0 ? (
-              <p style={styles.noComments}>Be the first to comment!</p>
-            ) : (
-              recordComments.map(comment => (
-                <div key={comment.id} style={styles.comment}>
-                  <span style={styles.commentAuthor}>{comment.userName}</span>
-                  <p style={styles.commentContent}>{comment.content}</p>
+            {comments.map(comment => (
+              <div key={comment.id} style={styles.commentItem}>
+                <div style={styles.commentAvatar}>{comment.avatar}</div>
+                <div style={styles.commentContent}>
+                  <div style={styles.commentHeader}>
+                    <span style={styles.commentUser}>{comment.user}</span>
+                    <span style={styles.commentTime}>{comment.time}</span>
+                  </div>
+                  <p style={styles.commentTextEntry}>{comment.text}</p>
                 </div>
-              ))
-            )}
+              </div>
+            ))}
           </div>
-
-          <div style={styles.commentInput}>
-            <input
-              type="text"
-              placeholder="Add a comment..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-              style={styles.input}
+          
+          <div style={styles.inputWrapper}>
+            <input 
+              type="text" 
+              placeholder="Leave a comment..." 
+              style={styles.commentInput}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handlePostComment()}
             />
-            <button onClick={handleAddComment} style={styles.sendButton}>
-              <Send size={20} />
+            <button 
+                style={{...styles.sendButton, opacity: commentText ? 1 : 0.5}} 
+                onClick={handlePostComment}
+                disabled={!commentText}
+            >
+              <Send size={18} color="white" />
             </button>
           </div>
         </div>
-      )}
+      </div>
+    </div>
+  );
+};
+
+// --- Reusable Components (Same as Analytics) ---
+
+const LegendItem = ({ label, time, color, icon: Icon }) => (
+  <div style={styles.legendItem}>
+    <span style={styles.legendTitle}>{label}</span>
+    <span style={styles.legendTime}>{time}</span>
+    <div style={{...styles.legendIconCircle, background: color}}>
+       <Icon size={20} color="white" />
+    </div>
+  </div>
+);
+
+// Ring Chart - NOW USES CORRECT PERCENTAGES
+const RingChart = ({ stats }) => {
+  const size = 260;
+  const center = size / 2;
+  const strokeWidth = 32;
+  const rings = [
+    { r: 100, color: stats.awake.color, percent: stats.awake.percent, bg: '#DCDCDC', icon: <Activity size={16} color={stats.awake.color} /> },
+    { r: 65, color: stats.light.color, percent: stats.light.percent, bg: '#EBEBEB', icon: <Brain size={16} color={stats.light.color} /> },
+    { r: 30, color: stats.deep.color, percent: stats.deep.percent, bg: '#F5F5F5', icon: <Plus size={16} color={stats.deep.color} /> }
+  ];
+  
+  const getCoordinates = (radius, percent) => {
+    const degrees = (percent * 360) - 90;
+    const radians = degrees * (Math.PI / 180);
+    return { x: center + radius * Math.cos(radians), y: center + radius * Math.sin(radians) };
+  };
+
+  return (
+    <div style={{ position: 'relative', width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {rings.map((ring, i) => {
+          const circumference = 2 * Math.PI * ring.r;
+          return (
+            <g key={i}>
+              <circle cx={center} cy={center} r={ring.r} fill="none" stroke={ring.bg} strokeWidth={strokeWidth} />
+              <circle cx={center} cy={center} r={ring.r} fill="none" stroke={ring.color} strokeWidth={strokeWidth} strokeLinecap="round" strokeDasharray={`${circumference * ring.percent} ${circumference}`} transform={`rotate(-90 ${center} ${center})`} />
+            </g>
+          );
+        })}
+      </svg>
+      {rings.map((ring, i) => {
+        const { x, y } = getCoordinates(ring.r, ring.percent);
+        return (
+          <div key={`icon-${i}`} style={{ position: 'absolute', left: x, top: y, transform: 'translate(-50%, -50%)', width: '24px', height: '24px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', zIndex: 10 }}>
+            {ring.icon}
+          </div>
+        );
+      })}
     </div>
   );
 };
 
 const styles = {
-  container: {
-    minHeight: '100vh',
-    background: 'linear-gradient(180deg, #F5D799 0%, #FFF8E7 30%)',
-    paddingBottom: '100px',
-  },
-  header: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '20px',
-    paddingTop: '40px',
-  },
-  backButton: {
-    background: 'white',
-    border: 'none',
-    borderRadius: '50%',
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-  },
-  title: {
-    fontSize: '20px',
-    fontWeight: '600',
-    color: '#2D3436',
-  },
-  dateDisplay: {
-    textAlign: 'center',
-    fontSize: '14px',
-    color: '#636E72',
-    marginBottom: '20px',
-  },
-  scoreCard: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '20px',
-  },
-  pointsCircle: {
-    width: '120px',
-    height: '120px',
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: '12px',
-    boxShadow: '0 8px 30px rgba(255, 107, 107, 0.3)',
-  },
-  points: {
-    fontSize: '28px',
-    fontWeight: '700',
-    color: 'white',
-  },
-  pointsLabel: {
-    fontSize: '12px',
-    color: 'white',
-    opacity: 0.9,
-  },
-  streakBadge: {
-    background: 'white',
-    padding: '8px 16px',
-    borderRadius: '20px',
-    fontSize: '14px',
-    fontWeight: '500',
-    color: '#FF6B6B',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  },
-  statsGrid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: '12px',
-    padding: '20px',
-  },
-  statCard: {
-    background: 'white',
-    borderRadius: '20px',
-    padding: '20px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  },
-  statValue: {
-    fontSize: '24px',
-    fontWeight: '700',
-    color: '#2D3436',
-    marginTop: '8px',
-  },
-  statLabel: {
-    fontSize: '12px',
-    color: '#636E72',
-    marginTop: '4px',
-  },
-  sleepStagesCard: {
-    background: 'white',
-    borderRadius: '20px',
-    padding: '20px',
-    margin: '0 20px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  },
-  sectionTitle: {
-    fontSize: '16px',
-    fontWeight: '600',
-    color: '#2D3436',
-    marginBottom: '16px',
-    display: 'flex',
-    alignItems: 'center',
-  },
-  stagesBar: {
-    display: 'flex',
-    height: '12px',
-    borderRadius: '6px',
-    overflow: 'hidden',
-    marginBottom: '16px',
-  },
-  stageSegment: {
-    height: '100%',
-  },
-  stagesLegend: {
-    display: 'flex',
-    justifyContent: 'space-around',
-  },
-  legendItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    fontSize: '12px',
-    color: '#636E72',
-  },
-  legendDot: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-  },
-  commentsSection: {
-    padding: '20px',
-    marginTop: '20px',
-  },
-  commentsList: {
-    background: 'white',
-    borderRadius: '20px',
-    padding: '16px',
-    marginBottom: '12px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-  },
-  noComments: {
-    textAlign: 'center',
-    color: '#636E72',
-    fontSize: '14px',
-  },
-  comment: {
-    padding: '12px 0',
-    borderBottom: '1px solid #F0F0F0',
-  },
-  commentAuthor: {
-    fontWeight: '600',
-    fontSize: '14px',
-    color: '#2D3436',
-  },
-  commentContent: {
-    fontSize: '13px',
-    color: '#636E72',
-    marginTop: '4px',
-  },
-  commentInput: {
-    display: 'flex',
-    gap: '10px',
-  },
-  input: {
-    flex: 1,
-    padding: '14px 20px',
-    borderRadius: '25px',
-    border: 'none',
-    background: 'white',
-    fontSize: '14px',
-    fontFamily: 'Poppins, sans-serif',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
-    outline: 'none',
-  },
-  sendButton: {
-    width: '50px',
-    height: '50px',
-    borderRadius: '50%',
-    background: '#FF6B6B',
-    border: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    color: 'white',
-    boxShadow: '0 4px 15px rgba(255, 107, 107, 0.3)',
-  },
+  container: { minHeight: '100vh', background: '#FFF9EE', position: 'relative', fontFamily: "'Inter', sans-serif", paddingBottom: '90px' },
+  topSection: { background: '#FFCA5F', paddingBottom: '80px', borderBottomLeftRadius: '0', borderBottomRightRadius: '0' },
+  navHeader: { padding: '20px 20px', display: 'flex', alignItems: 'center' },
+  backButton: { background: 'white', border: 'none', borderRadius: '50%', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' },
+  
+  sleptForCard: { background: '#FFF9EE', marginTop: '-50px', marginLeft: '20px', marginRight: '20px', borderRadius: '40px', padding: '30px 24px', textAlign: 'center', position: 'relative', zIndex: 10 },
+  avatarContainer: { position: 'absolute', top: '-40px', left: '50%', transform: 'translateX(-50%)', width: '64px', height: '64px', background: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' },
+  sleptForTitle: { fontSize: '26px', fontWeight: '700', color: '#4A3B32', marginBottom: '8px', fontFamily: "'Lora', serif" },
+  sleptForValue: { fontSize: '72px', fontWeight: '800', color: '#3D2E28', lineHeight: '1' },
+  sleptForUnit: { fontSize: '36px', color: '#C7C7C7', marginLeft: '6px', fontWeight: '500' },
+  
+  content: { padding: '10px 20px 20px' },
+  statsRow: { display: 'flex', gap: '12px', marginBottom: '32px' },
+  timesCard: { flex: '1.4', background: '#FFCA5F', borderRadius: '32px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' },
+  timesHeaderRow: { display: 'flex', justifyContent: 'space-between', gap: '8px' },
+  timeBlock: { display: 'flex', flexDirection: 'column' },
+  timeLabel: { fontSize: '11px', fontWeight: '800', color: '#8A7A5A', marginBottom: '6px', textTransform: 'uppercase', opacity: 0.8 },
+  timeValue: { fontSize: '18px', fontWeight: '900', color: '#1A1A1A' },
+  qualityCard: { flex: '1', background: '#FFCA5F', borderRadius: '32px', padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' },
+  qualityLabel: { fontSize: '13px', fontWeight: '700', color: '#8A7A5A', marginBottom: '4px', opacity: 0.9 },
+  qualityValueContainer: { display: 'flex', alignItems: 'baseline' },
+  qualityNumber: { fontSize: '56px', fontWeight: '900', color: '#1A1A1A', lineHeight: '1' },
+  qualityPercent: { fontSize: '28px', fontWeight: '800', color: '#1A1A1A' },
+  
+  sectionTitle: { fontSize: '28px', fontWeight: '700', color: '#3D2E28', fontFamily: "'Lora', serif", marginBottom: '16px' },
+  
+  // Dream Section Styles
+  dreamCard: { background: 'white', borderRadius: '28px', padding: '24px', marginBottom: '32px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)', border: '1px solid rgba(0,0,0,0.03)' },
+  dreamHeader: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' },
+  dreamLabel: { fontSize: '14px', fontWeight: '700', color: '#6B4C9A', textTransform: 'uppercase' },
+  dreamText: { fontSize: '16px', color: '#4B5563', fontStyle: 'italic', lineHeight: '1.5', fontFamily: "'Lora', serif" },
+  emptyDreamState: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '10px 0', opacity: 0.6 },
+  emptyDreamText: { fontSize: '14px', color: '#64748B' },
+
+  insightsCard: { background: '#F8F6F2', borderRadius: '40px', padding: '40px 10px', marginBottom: '32px' },
+  chartContainer: { display: 'flex', justifyContent: 'center', marginBottom: '40px' },
+  legendRow: { display: 'flex', justifyContent: 'space-evenly', padding: '0 10px' },
+  legendItem: { display: 'flex', flexDirection: 'column', alignItems: 'center' },
+  legendTitle: { fontSize: '12px', fontWeight: '800', color: '#9CA3AF', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' },
+  legendTime: { fontSize: '20px', fontWeight: '800', color: '#1A1A1A', marginBottom: '16px' },
+  legendIconCircle: { width: '56px', height: '56px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' },
+  
+  // Comments Styles
+  commentsSection: { background: 'white', borderRadius: '32px', padding: '20px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' },
+  commentsList: { display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '20px' },
+  commentItem: { display: 'flex', gap: '12px' },
+  commentAvatar: { width: '40px', height: '40px', borderRadius: '50%', background: '#F3F4F6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', flexShrink: 0 },
+  commentContent: { flex: 1, background: '#F9FAFB', borderRadius: '16px', padding: '12px', borderTopLeftRadius: '4px' },
+  commentHeader: { display: 'flex', justifyContent: 'space-between', marginBottom: '4px', alignItems: 'center' },
+  commentUser: { fontSize: '14px', fontWeight: '700', color: '#1F2937' },
+  commentTime: { fontSize: '11px', color: '#9CA3AF' },
+  commentTextEntry: { fontSize: '14px', color: '#4B5563', lineHeight: '1.4' },
+  
+  inputWrapper: { display: 'flex', gap: '8px', alignItems: 'center', background: '#F3F4F6', padding: '8px', borderRadius: '24px' },
+  commentInput: { flex: 1, border: 'none', background: 'transparent', padding: '8px 12px', fontSize: '14px', outline: 'none', color: '#374151' },
+  sendButton: { width: '36px', height: '36px', borderRadius: '50%', background: '#2D3436', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'opacity 0.2s' }
 };
 
 export default DetailedSleepPage;
