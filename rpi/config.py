@@ -15,7 +15,7 @@ SAMPLE_RATE_HZ = 10  # Samples per second (5-10 Hz recommended)
 SAMPLE_INTERVAL = 1.0 / SAMPLE_RATE_HZ
 
 # ============= Window Configuration =============
-WINDOW_DURATION_SECONDS = 30  # Aggregate samples into 30s windows
+WINDOW_DURATION_SECONDS = 5  # Aggregate samples into 30s windows
 
 # ============= Detection Thresholds =============
 # Distance thresholds (in meters)
@@ -23,12 +23,12 @@ IN_BED_THRESHOLD_M = 1.0      # < 1m = person in bed
 OUT_OF_BED_THRESHOLD_M = 1.2  # > 1.2m with hysteresis = out of bed
 
 # Debounce times
-IN_BED_DEBOUNCE_SECONDS = 15   # Must be < threshold for N seconds to start session
-OUT_OF_BED_DEBOUNCE_SECONDS = 120  # Must be > threshold for M seconds to end session (2 min)
+IN_BED_DEBOUNCE_SECONDS = 5   # Must be < threshold for N seconds to start session
+OUT_OF_BED_DEBOUNCE_SECONDS = 5  # Must be > threshold for M seconds to end session (2 min)
 
 # ============= Movement Detection =============
 MOVEMENT_THRESHOLD_MULTIPLIER = 5.0  # threshold = noise_floor * this value
-CALIBRATION_DURATION_SECONDS = 120   # 2 minutes calibration at start
+CALIBRATION_DURATION_SECONDS = 5   # 5 seconds calibration at start
 MEDIAN_FILTER_WINDOW = 5
 EMA_ALPHA = 0.3  # Exponential Moving Average smoothing factor
 
