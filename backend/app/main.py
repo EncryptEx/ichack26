@@ -8,7 +8,7 @@ from .database import init_db
 from .routers import users, sleep, dreams, analytics, leaderboard, rpi
 
 app = FastAPI(
-    title="Recharge Royale - Smart Pillow API",
+    title="Dormant - Smart Pillow API",
     description="API for detecting sleep schedule via ultrasonic sensor",
     version="2.0.0"
 )

@@ -1,4 +1,4 @@
-# Recharge Royale - Smart Pillow API
+# Dormant - Smart Pillow API
 
 A comprehensive FastAPI backend for tracking sleep schedules, managing dream logs, viewing analytics, and competing on leaderboards.
 
