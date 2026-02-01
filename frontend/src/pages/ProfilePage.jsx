@@ -18,8 +18,7 @@ const ProfilePage = () => {
   };
 
   const handleLogout = () => {
-     alert("Logged out!");
-     navigate('/');
+     navigate('/login');
   };
 
   return (

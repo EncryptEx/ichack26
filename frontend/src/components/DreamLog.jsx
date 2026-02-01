@@ -1,8 +1,11 @@
 // src/components/DreamLog.jsx
 import { useRef, useState } from 'react';
 import { Mic, X, Send, PenLine } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { currentUser } from '../data/mockData';
 
 const DreamLog = ({ dreams, onAddDream }) => {
+  const navigate = useNavigate();
   const scrollRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [dreamText, setDreamText] = useState('');

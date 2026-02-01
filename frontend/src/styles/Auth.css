@@ -1,0 +1,218 @@
+/* Login & Signup pages styling */
+
+.auth-container {
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff9ee;
+    padding: var(--space-md);
+    position: relative;
+    overflow: hidden;
+}
+
+/* large decorative blob in bckground */
+.auth-blob {
+    position: absolute;
+    width: 600px; /* Much larger to look like a background shape */
+    height: 600px;
+    background: #F8DFA1; /* Pale yellow from screenshot */
+    border-radius: 50%;
+    top: -200px;
+    left: -200px;
+    z-index: 0;
+    /* User said "floating blob is fine" so we keep animation but minimal movement */
+    animation: blobFloat 20s ease-in-out infinite;
+}
+
+@keyframes blobFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+    }
+    33% {
+        transform: translate(20px, -10px) scale(1.02);
+    }
+    66% {
+        transform: translate(-10px, 15px) scale(0.99);
+    }
+}
+
+.auth-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.auth-header {
+    margin-bottom: 2rem;
+    animation: fadeIn 0.8s ease-out 0.2s both;
+    position: relative;
+    padding-top: 40px; /* Push down to be inside blob area effectively */
+}
+
+.auth-title {
+    font-family: 'Lora', serif; /* Explicit serif from profile page usage */
+    font-size: 42px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+}
+
+.auth-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #1A1A1A;
+    font-weight: 400;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 40px; /* Separation from header */
+}
+
+.form-group label {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin-bottom: 8px; /* Space between label and input */
+    display: block;
+}
+
+.form-group input {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    padding: 16px 20px;
+    border: none;
+    border-radius: 16px; /* Rounded corners from screenshot */
+    background-color: #FFFFFF;
+    color: #1A1A1A;
+    box-shadow: none; /* No shadow by default */
+    transition: all 0.1s ease;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Important for padding */
+}
+
+.form-group input:focus,
+.form-group input:hover {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Appears on hover/focus */
+    transform: translateY(-1px);
+}
+
+.auth-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 16px;
+    border: none;
+    border-radius: 30px; /* Pill shape */
+    background: #FFBD3F; /* Golden yellow from screenshot */
+    color: #1A1A1A;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 189, 63, 0.4);
+    transition: all 0.3s ease;
+    margin-top: 30px;
+    width: 100%;
+    animation: fadeIn 0.8s ease-out 0.7s both;
+}
+
+.auth-button:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+.auth-button:active {
+    transform: translateY(-1px);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 40px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #4A4A4A;
+    animation: fadeIn 0.8s ease-out 0.8s both;
+}
+
+.auth-link {
+    color: #4A4A4A;
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    position: relative;
+    margin-left: 4px; /* Space */
+}
+
+.auth-link::after {
+    /* No underline interaction shown in screen, keeping basic */
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: 0px;
+    left: 0;
+    background-color: #4A4A4A;
+    transition: width 0.3s ease;
+}
+
+.auth-link:hover::after {
+    width: 100%;
+}
+
+.auth-link:hover {
+    color: var(--primary);
+}
+
+/* responsiveness */
+@media (max-width: 480px) {
+    .auth-title {
+        font-size: 40px;
+    }
+
+    .auth-subtitle {
+        font-size: 14px;
+    }
+
+    .auth-blob {
+        width: 350px;
+        height: 350px;
+        top: -100px;
+        left: -70px;
+    }
+
+    .form-group input {
+        padding: 14px 18px;
+        font-size: 15px;
+    }
+
+    .auth-button {
+        padding: 16px;
+        font-size: 16px;
+    }
+}
+
+
+.form-group input:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: radial-gradient(circle at 2px 2px, rgba(28, 28, 30, 0.02) 1px, transparent 0);
+    background-size: 40px 40px;
+    z-index: 0;
+    pointer-events: none;
+}

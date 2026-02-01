@@ -11,6 +11,7 @@ const DetailedSleepPage = () => {
   // Find user (Mock logic)
   const allUsers = [currentUser, ...friends];
   const user = allUsers.find(u => u.id === userId) || currentUser;
+  const isCurrentUser = user.id === currentUser.id;
   
   // Mock Data specific to this view
   const sleepStats = {
@@ -63,7 +64,9 @@ const DetailedSleepPage = () => {
         <div style={styles.avatarContainer}>
             <span style={{fontSize: '32px'}}>{user.avatar}</span>
         </div>
-        <h2 style={styles.sleptForTitle}>{user.name.split(' ')[0]} slept for</h2>
+        <h2 style={styles.sleptForTitle}>
+            {isCurrentUser ? "You slept for" : `${user.name.split(' ')[0]} slept for`}
+        </h2>
         <div style={styles.sleptForValue}>
           {sleepStats.total}<span style={styles.sleptForUnit}>h</span>
         </div>
