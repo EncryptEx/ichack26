@@ -1,3 +1,5 @@
+# Dormant - The start of competitive naps
+
 ## Inspiration
 
 Modern health apps obsess over productivity and fitness, but sleep - one of the most important foundations of performance - is often treated passively. We wanted to flip that mindset.
