@@ -14,23 +14,23 @@ const SleepCard = ({ user, sleepData, isCurrentUser, rank, compact = false }) =>
       return {
         ...styles.card,
         ...styles.currentUserCard,
-        background: isUp ? '#FFD4C8' : '#8EB4DF',
-        borderColor: isUp ? '#E33A3A' : '#5994D5',
+        background: isUp ? '#FFE0DC' : '#DCE9F5',
+        borderColor: isUp ? '#E54D4D' : '#5B93CC',
       };
     }
     if (compact) {
       return {
         ...styles.card,
         ...styles.compactCard,
-        background: isUp ? '#FFD4C8' : '#8EB4DF',
-        borderColor: isUp ? '#E33A3A' : '#5994D5',
+        background: isUp ? '#FFE0DC' : '#DCE9F5',
+        borderColor: isUp ? '#E54D4D' : '#5B93CC',
       };
     }
     return styles.card;
   };
 
   const getTextColor = () => {
-    return isUp ? '#E33A3A' : '#5994D5';
+    return isUp ? '#E54D4D' : '#5B93CC';
   };
 
   const getRankIcon = () => {
@@ -39,16 +39,20 @@ const SleepCard = ({ user, sleepData, isCurrentUser, rank, compact = false }) =>
 
   // Compact card for friends in the scrollable list
   if (compact && !isCurrentUser) {
+    const hasStreak = user.streak >= 3;
     return (
       <div style={getCardStyle()} onClick={handleClick}>
         <div style={styles.leftSection}>
-          <div style={styles.compactAvatarSection}>
-            <span style={styles.compactAvatar}>{user.avatar || '😴'}</span>
+          <div style={styles.avatarWrapper}>
+            <div style={styles.compactAvatarSection}>
+              <span style={styles.compactAvatar}>{user.avatar || '😴'}</span>
+            </div>
+            {hasStreak && <span style={styles.fireEmoji}>🔥</span>}
           </div>
           <div style={styles.userInfo}>
             <span style={styles.compactUserName}>{user.name}</span>
-            <span style={{ ...styles.compactStreak, color: getTextColor() }}>
-              {user.streak > 0 && '🔥'} {user.streak} day streak
+            <span style={{ ...styles.compactStreak, color: hasStreak ? getTextColor() : '#9B9B9B' }}>
+              {user.streak} day streak
             </span>
           </div>
         </div>
@@ -67,14 +71,15 @@ const SleepCard = ({ user, sleepData, isCurrentUser, rank, compact = false }) =>
   }
 
   // Full card for current user
+  const hasStreak = user.streak >= 3;
   return (
     <div style={getCardStyle()} onClick={handleClick}>
       <div style={styles.mainUserContent}>
         <div style={styles.topRow}>
           <div style={styles.userInfoLarge}>
             <span style={styles.userNameLarge}>You</span>
-            <span style={{ ...styles.streakLarge, color: getTextColor() }}>
-              {user.streak > 0 && '🔥'} {user.streak} day streak
+            <span style={{ ...styles.streakLarge, color: hasStreak ? getTextColor() : '#9B9B9B' }}>
+              {hasStreak && '🔥'} {user.streak} day streak
             </span>
           </div>
           <div style={{ ...styles.rankIndicator, color: getTextColor() }}>
@@ -104,71 +109,85 @@ const SleepCard = ({ user, sleepData, isCurrentUser, rank, compact = false }) =>
 const styles = {
   card: {
     background: 'white',
-    borderRadius: '24px',
-    padding: '14px 16px',
-    marginBottom: '8px',
-    marginLeft: '8px',
-    marginRight: '8px',
+    borderRadius: '28px',
+    padding: '18px 20px',
+    marginBottom: '12px',
+    marginLeft: '0',
+    marginRight: '0',
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     cursor: 'pointer',
     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)',
     transition: 'transform 0.2s, box-shadow 0.2s',
-    border: '2px solid transparent',
+    border: '3px solid transparent',
     fontFamily: "'Inter', sans-serif",
   },
   currentUserCard: {
-    background: '#FFD4C8',
-    border: '2px solid #E33A3A',
-    padding: '16px',
-    marginBottom: '8px',
+    background: '#FFE0DC',
+    border: '3px solid #E54D4D',
+    padding: '20px 22px',
+    marginBottom: '14px',
     flexDirection: 'column',
     alignItems: 'stretch',
-    minHeight: '140px',
+    minHeight: '170px',
+    borderRadius: '28px',
   },
   compactCard: {
-    padding: '14px 16px',
-    marginBottom: '8px',
-    minHeight: '70px',
+    padding: '16px 20px',
+    marginBottom: '12px',
+    minHeight: '90px',
+    border: '3px solid',
+    borderRadius: '28px',
+  },
+  avatarWrapper: {
+    position: 'relative',
+    width: '52px',
+    height: '52px',
+  },
+  fireEmoji: {
+    position: 'absolute',
+    bottom: '-4px',
+    right: '-6px',
+    fontSize: '18px',
   },
   leftSection: {
     display: 'flex',
     alignItems: 'center',
-    gap: '10px',
+    gap: '14px',
   },
   compactAvatarSection: {
-    width: '40px',
-    height: '40px',
+    width: '52px',
+    height: '52px',
     borderRadius: '50%',
-    background: 'rgba(255, 255, 255, 0.6)',
+    background: 'rgba(255, 255, 255, 0.7)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
   },
   compactAvatar: {
-    fontSize: '20px',
+    fontSize: '26px',
   },
   userInfo: {
     display: 'flex',
     flexDirection: 'column',
   },
   compactUserName: {
-    fontSize: '15px',
-    fontWeight: '600',
+    fontSize: '17px',
+    fontWeight: '700',
     color: '#2D3436',
   },
   compactStreak: {
-    fontSize: '11px',
-    fontWeight: '500',
+    fontSize: '13px',
+    fontWeight: '600',
   },
   rightSection: {
     textAlign: 'right',
   },
   compactPointsBadge: {
-    fontSize: '13px',
-    fontWeight: '600',
-    marginBottom: '2px',
+    fontSize: '15px',
+    fontWeight: '700',
+    marginBottom: '4px',
   },
   compactStatsRow: {
     display: 'flex',
@@ -176,12 +195,13 @@ const styles = {
     alignItems: 'flex-end',
   },
   compactStatLabel: {
-    fontSize: '10px',
+    fontSize: '12px',
     color: '#636E72',
+    fontWeight: '500',
   },
   compactStatValue: {
-    fontSize: '13px',
-    fontWeight: '600',
+    fontSize: '15px',
+    fontWeight: '700',
     color: '#2D3436',
   },
   // Large card styles for current user
@@ -192,29 +212,29 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: '8px',
+    marginBottom: '10px',
   },
   userInfoLarge: {
     display: 'flex',
     flexDirection: 'column',
   },
   userNameLarge: {
-    fontSize: '17px',
+    fontSize: '20px',
     fontWeight: '700',
     color: '#2D3436',
   },
   streakLarge: {
-    fontSize: '13px',
-    fontWeight: '500',
+    fontSize: '15px',
+    fontWeight: '600',
   },
   rankIndicator: {
-    fontSize: '18px',
+    fontSize: '20px',
   },
   pointsLarge: {
-    fontSize: '22px',
+    fontSize: '26px',
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: '14px',
+    marginBottom: '16px',
   },
   statsRowLarge: {
     display: 'flex',
@@ -226,12 +246,13 @@ const styles = {
     alignItems: 'center',
   },
   statLabelLarge: {
-    fontSize: '12px',
+    fontSize: '14px',
     color: '#636E72',
-    marginBottom: '2px',
+    marginBottom: '4px',
+    fontWeight: '500',
   },
   statValueLarge: {
-    fontSize: '18px',
+    fontSize: '22px',
     fontWeight: '700',
     color: '#2D3436',
   },

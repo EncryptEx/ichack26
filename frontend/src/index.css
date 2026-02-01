@@ -6,19 +6,19 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: #FBF5E7;
+  background: #FFF9EE;
   min-height: 100vh;
 }
 
 :root {
   --primary-yellow: #FFCA5F;
-  --light-yellow: #FBF5E7;
-  --coral: #E33A3A;
-  --coral-light: #FFD4C8;
-  --blue-light: #8EB4DF;
-  --blue: #5994D5;
+  --light-yellow: #FFF9EE;
+  --coral: #E54D4D;
+  --coral-light: #FFE0DC;
+  --blue-light: #DCE9F5;
+  --blue: #5B93CC;
   --text-dark: #2D3436;
-  --text-gray: #636E72;
+  --text-gray: #7A8289;
   --white: #FFFFFF;
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }

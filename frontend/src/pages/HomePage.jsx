@@ -44,12 +44,13 @@ const HomePage = () => {
       
       <div style={styles.content}>
         <header style={styles.header}>
-          <h1 style={styles.greeting}>{greeting}, {currentUser.name}</h1>
+          <h1 style={styles.greeting}>{greeting}, {currentUser.name.split(' ')[0]}</h1>
         </header>
 
         <Calendar selectedDate={selectedDate} onDateSelect={setSelectedDate} />
 
         <section style={styles.sleepSection}>
+          <h2 style={styles.sectionTitle}>Last Night</h2>
           {/* Scrollable sleep cards container */}
           <div style={styles.sleepScrollContainer} className="sleep-scroll">
             {/* Current user card */}
@@ -87,7 +88,7 @@ const styles = {
     height: '100vh',
     maxHeight: '100vh',
     overflow: 'hidden',
-    background: '#FBF5E7',
+    background: '#FFF9EE',
     position: 'relative',
   },
   yellowBackground: {
@@ -95,7 +96,7 @@ const styles = {
     top: 0,
     left: 0,
     right: 0,
-    height: '280px',
+    height: '320px',
     background: '#FFCA5F',
     borderBottomLeftRadius: '0',
     borderBottomRightRadius: '0',
@@ -110,15 +111,15 @@ const styles = {
     paddingBottom: '70px',
   },
   header: {
-    padding: '24px 16px 8px',
+    padding: '40px 36px 12px',
     flexShrink: 0,
   },
   greeting: {
-    fontSize: '28px',
-    fontWeight: '600',
+    fontSize: '42px',
+    fontWeight: '700',
     color: '#2D3436',
-    fontStyle: 'italic',
     fontFamily: "'Lora', serif",
+    margin: 0,
   },
   sleepSection: {
     padding: '8px 0',
@@ -128,13 +129,21 @@ const styles = {
     minHeight: 0,
     overflow: 'hidden',
   },
+  sectionTitle: {
+    fontSize: '22px',
+    fontWeight: '700',
+    color: '#2D3436',
+    fontFamily: "'Lora', serif",
+    marginBottom: '16px',
+    paddingLeft: '36px',
+  },
   sleepScrollContainer: {
     flex: 1,
     overflowY: 'auto',
     overflowX: 'hidden',
-    paddingLeft: '16px',
-    paddingRight: '20px',
-    borderRadius: '16px',
+    paddingLeft: '36px',
+    paddingRight: '24px',
+    marginRight: '8px',
   },
 };
 
