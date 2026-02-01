@@ -5,12 +5,12 @@ from .models import DistanceResponse
 from .database import init_db
 
 # Import routers
-from .routers import users, sleep, dreams, analytics, leaderboard
+from .routers import users, sleep, dreams, analytics, leaderboard, rpi
 
 app = FastAPI(
     title="Recharge Royale - Smart Pillow API",
     description="API for detecting sleep schedule via ultrasonic sensor",
-    version="1.0.0"
+    version="2.0.0"
 )
 
 # CORS middleware for frontend integration
@@ -33,6 +33,7 @@ app.include_router(sleep.router)
 app.include_router(dreams.router)
 app.include_router(analytics.router)
 app.include_router(leaderboard.router)
+app.include_router(rpi.router)
 
 @app.get("/")
 def read_root():
@@ -47,7 +48,8 @@ def read_root():
             "sleep": "/api/sleep",
             "dreams": "/api/dreams",
             "analytics": "/api/analytics",
-            "leaderboard": "/api/leaderboard"
+            "leaderboard": "/api/leaderboard",
+            "rpi": "/api/rpi"
         }
     }
 
