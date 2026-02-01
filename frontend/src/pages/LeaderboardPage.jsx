@@ -1,4 +1,4 @@
-import { ArrowLeft, Crown } from 'lucide-react';
+import { Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { currentUser, friends, generateSleepData } from '../data/mockData';
 
@@ -50,11 +50,7 @@ const LeaderboardPage = () => {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <button onClick={() => navigate('/')} style={styles.backButton}>
-           <ArrowLeft size={24} color="#2D3436" />
-        </button>
         <h1 style={styles.title}>Leaderboard</h1>
-        <div style={{ width: 40 }} />
       </header>
 
       {/* Podium Section - Rising Graph Order: 3 -> 2 -> 1 */}
@@ -154,7 +150,7 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     padding: '24px 36px 0',
   },
   backButton: {
@@ -164,10 +160,7 @@ const styles = {
     padding: '0',
   },
   title: {
-    fontSize: '24px',
-    fontWeight: '700', // Bolder
-    fontFamily: "'Lora', serif", 
-    color: '#2D3436'
+    fontSize: '34px',
   },
   
   // Podium

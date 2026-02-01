@@ -56,7 +56,7 @@ const AnalyticsPage = () => {
         dataList = [dailyData];
         // Mock hourly bars for visual effect
         labels = [dailyData.bedTime + ' p.m.', dailyData.wakeTime + ' a.m.'];
-        bars = Array(21).fill(0).map(() => {
+        bars = Array(20).fill(0).map(() => {
            const h = Math.random() * 80;
            return { h, color: h > 50 ? '#97AF68' : '#EA8323' };
         });
@@ -77,19 +77,20 @@ const AnalyticsPage = () => {
         }
      }
 
-     // Calculate Average Breakdown
+     // Calculate Average Breakdown based on actual sleep hours
      const avgDeep = dataList.reduce((acc, d) => acc + d.deepSleep, 0) / dataList.length;
      const avgLight = dataList.reduce((acc, d) => acc + d.lightSleep + d.remSleep, 0) / dataList.length; 
      const avgAwake = dataList.reduce((acc, d) => acc + (d.sleepHours * 0.15), 0) / dataList.length; // Mock ~15% awake
      
-     const total = avgDeep + avgLight + avgAwake;
+     // Total hours is the sum of all sleep phases
+     const totalHours = avgDeep + avgLight + avgAwake;
 
      return {
          currentGraph: { labels, bars },
          breakdown: {
-            awake: { time: formatDuration(avgAwake), percent: avgAwake/total, color: '#7E7E7E' },
-            light: { time: formatDuration(avgLight), percent: avgLight/total, color: '#97AF68' },
-            deep: { time: formatDuration(avgDeep), percent: avgDeep/total, color: '#EA8323' }
+            awake: { time: formatDuration(avgAwake), percent: avgAwake / totalHours, color: '#7E7E7E' },
+            light: { time: formatDuration(avgLight), percent: avgLight / totalHours, color: '#97AF68' },
+            deep: { time: formatDuration(avgDeep), percent: avgDeep / totalHours, color: '#EA8323' }
          }
      };
   }, [selectedDate, timeRange, dailyData]);
@@ -236,7 +237,7 @@ const LegendItem = ({ label, time, color, icon: Icon }) => (
   </div>
 );
 
-// Ring Chart (Unchanged visual)
+// Ring Chart - NOW USES CORRECT PERCENTAGES
 const RingChart = ({ stats }) => {
   const size = 260;
   const center = size / 2;

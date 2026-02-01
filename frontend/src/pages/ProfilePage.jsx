@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Edit2, Users, LogOut, X } from 'lucide-react';
+import { Edit2, Users, LogOut, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { currentUser, friends } from '../data/mockData';
 
@@ -24,11 +24,7 @@ const ProfilePage = () => {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <button onClick={() => navigate('/')} style={styles.backButton}>
-          <ArrowLeft size={24} color="#2D3436" />
-        </button>
         <h1 style={styles.title}>Profile</h1>
-        <div style={{width: 24}}></div>
       </header>
 
       <div style={styles.content}>
@@ -114,7 +110,7 @@ const styles = {
   header: {
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     padding: '24px 24px',
   },
   backButton: {
@@ -124,7 +120,7 @@ const styles = {
     padding: 0
   },
   title: {
-    fontSize: '24px',
+    fontSize: '34px',
     fontWeight: '700',
     fontFamily: "'Lora', serif",
   },

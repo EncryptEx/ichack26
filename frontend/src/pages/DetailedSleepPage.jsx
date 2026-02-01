@@ -13,16 +13,33 @@ const DetailedSleepPage = () => {
   const user = allUsers.find(u => u.id === userId) || currentUser;
   const isCurrentUser = user.id === currentUser.id;
   
-  // Mock Data specific to this view
+  // Mock Data specific to this view - WITH PROPER PERCENTAGE CALCULATION
+  const deepSleepHours = 2.4;
+  const lightSleepHours = 4.3;
+  const awakeHours = 0.8;
+  const totalHours = deepSleepHours + lightSleepHours + awakeHours;
+
   const sleepStats = {
-    total: 7.5,
+    total: totalHours.toFixed(1),
     fallAsleep: '11:45 PM',
     wakeUp: '07:15 AM',
     quality: 72,
     breakdown: {
-      awake: { time: '20 min', percent: 0.10, color: '#7E7E7E' },
-      light: { time: '04:30 h', percent: 0.60, color: '#97AF68' },
-      deep: { time: '02:40 h', percent: 0.30, color: '#EA8323' }
+      awake: { 
+        time: `${Math.floor(awakeHours * 60)} min`, 
+        percent: awakeHours / totalHours, 
+        color: '#7E7E7E' 
+      },
+      light: { 
+        time: `${String(Math.floor(lightSleepHours)).padStart(2, '0')}:${String(Math.round((lightSleepHours % 1) * 60)).padStart(2, '0')} h`, 
+        percent: lightSleepHours / totalHours, 
+        color: '#97AF68' 
+      },
+      deep: { 
+        time: `${String(Math.floor(deepSleepHours)).padStart(2, '0')}:${String(Math.round((deepSleepHours % 1) * 60)).padStart(2, '0')} h`, 
+        percent: deepSleepHours / totalHours, 
+        color: '#EA8323' 
+      }
     }
   };
 
@@ -184,6 +201,7 @@ const LegendItem = ({ label, time, color, icon: Icon }) => (
   </div>
 );
 
+// Ring Chart - NOW USES CORRECT PERCENTAGES
 const RingChart = ({ stats }) => {
   const size = 260;
   const center = size / 2;

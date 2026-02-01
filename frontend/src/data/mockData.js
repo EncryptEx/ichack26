@@ -36,6 +36,16 @@ export const generateSleepData = (userId, date) => {
   const bedTime = `${pad(bedHour)}:${pad(bedMin)}`;
   const wakeTime = `${pad(wakeHour)}:${pad(wakeMin)}`;
   
+  // Vary ratios to make charts look dynamic
+  // Deep sleep: 15-30%
+  // REM: 15-25%
+  // Light: Remaining
+  const deepRatio = 0.15 + ((seed * 7 % 15) / 100);
+  const remRatio = 0.15 + ((seed * 3 % 10) / 100);
+  const deep = parseFloat((sleepHours * deepRatio).toFixed(1));
+  const rem = parseFloat((sleepHours * remRatio).toFixed(1));
+  const light = parseFloat((sleepHours - deep - rem).toFixed(1));
+
   return {
     userId,
     date: date.toISOString(),
@@ -45,9 +55,9 @@ export const generateSleepData = (userId, date) => {
     pointsChange,
     bedTime,
     wakeTime,
-    deepSleep: parseFloat((sleepHours * 0.2).toFixed(1)),
-    remSleep: parseFloat((sleepHours * 0.25).toFixed(1)),
-    lightSleep: parseFloat((sleepHours * 0.55).toFixed(1)),
+    deepSleep: deep,
+    remSleep: rem,
+    lightSleep: light,
   };
 };
 
